@@ -253,6 +253,14 @@ function gerarOrcamento() {
     const acrescimoTexto = acrescimoElem.style.display !== 'none' ? document.getElementById('valorAcrescimo').textContent : '0,00';
     const total = document.getElementById('valorTotal').textContent;
 
+    // Coletar configurações de desconto e acréscimo para salvar
+    const tipoDesconto = document.querySelector('input[name="tipoDesconto"]:checked').value;
+    const valorDesconto = document.getElementById('descontoValor').value;
+    const porcDesconto = document.getElementById('descontoPorc').value;
+    const tipoAcrescimo = document.querySelector('input[name="tipoAcrescimo"]:checked').value;
+    const valorAcrescimo = document.getElementById('acrescimoValor').value;
+    const porcAcrescimo = document.getElementById('acrescimoPorc').value;
+
     // Nome do arquivo PDF
     let nomeArquivo = 'Orcamento';
     if (nome) nomeArquivo += `_${nome.replace(/\s/g, '_')}`;
@@ -262,16 +270,17 @@ function gerarOrcamento() {
     const servicos = [];
     document.querySelectorAll('.servico-item').forEach(s => {
         const tipo = s.querySelector('.tipoServico').value;
-        if (tipo && tipo !== 'Outro') {
-            servicos.push(tipo);
-        } else if (tipo === 'Outro') {
-            const desc = s.querySelector('.descricaoServico').value.trim();
-            const val = s.querySelector('.valorServico').value;
-            if (desc && val) servicos.push(`${desc} - R$ ${val}`);
-        }
+        const desc = s.querySelector('.descricaoServico') ? s.querySelector('.descricaoServico').value : '';
+        const val = s.querySelector('.valorServico') ? s.querySelector('.valorServico').value : '';
+        
+        servicos.push({
+            tipo: tipo,
+            descricao: desc,
+            valor: val
+        });
     });
 
-    if (servicos.length === 0) {
+    if (servicos.length === 0 || servicos.every(s => !s.tipo)) {
         alert('Adicione pelo menos um serviço!');
         return;
     }
@@ -305,7 +314,11 @@ function gerarOrcamento() {
     doc.setFont('normal');
     y += 10;
     servicos.forEach(s => {
-        doc.text(`• ${s}`, 22, y);
+        let texto = s.tipo;
+        if (s.tipo === 'Outro' && s.descricao) {
+            texto = `${s.descricao} - R$ ${s.valor}`;
+        }
+        doc.text(`• ${texto}`, 22, y);
         y += 8;
     });
 
@@ -347,7 +360,18 @@ function gerarOrcamento() {
 
     // Salva o arquivo
     doc.save(nomeArquivo);
-    salvarNoHistorico({ nomeArquivo, dataHora: dataHora.toLocaleString('pt-BR'), conteudo: doc.output('blob') });
+    
+    // Salva dados completos para reedição
+    const dadosCompletos = {
+        nomeArquivo,
+        dataHora: dataHora.toLocaleString('pt-BR'),
+        conteudo: doc.output('blob'),
+        dadosCliente: { nome, cpf, email, telefone },
+        servicos: servicos,
+        ajustes: { tipoDesconto, valorDesconto, porcDesconto, tipoAcrescimo, valorAcrescimo, porcAcrescimo }
+    };
+    
+    salvarNoHistorico(dadosCompletos);
 }
 
 // Funções de Histórico (LocalStorage)
@@ -372,6 +396,7 @@ function carregarHistorico() {
                 <small>${item.dataHora}</small>
             </div>
             <div>
+                <button onclick="reeditarOrcamento(${index})">✏️ Reeditar</button>
                 <button onclick="baixarNovamente(${index})">⬇ Baixar</button>
                 <button onclick="excluirDoHistorico(${index})">🗑 Excluir</button>
             </div>
@@ -396,7 +421,119 @@ function baixarNovamente(index) {
     link.click();
 }
 
+// ✨ NOVA FUNÇÃO: Reeditar orçamento salvo
+function reeditarOrcamento(index) {
+    const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
+    const item = historico[index];
+    if (!item) return;
+
+    // 1. Limpar formulário atual
+    document.getElementById('nomeCliente').value = '';
+    document.getElementById('cpfCliente').value = '';
+    document.getElementById('emailCliente').value = '';
+    document.getElementById('telefoneCliente').value = '';
+    
+    // Remover todos os serviços exceto o primeiro
+    const listaServicos = document.getElementById('listaServicos');
+    while (listaServicos.children.length > 1) {
+        listaServicos.removeChild(listaServicos.lastChild);
+    }
+
+    // Resetar ajustes (desconto e acréscimo)
+    document.querySelector('input[name="tipoDesconto"][value="nenhum"]').checked = true;
+    document.getElementById('descontoValor').value = '';
+    document.getElementById('descontoValor').disabled = true;
+    document.getElementById('descontoPorc').value = '';
+    document.getElementById('descontoPorc').disabled = true;
+
+    document.querySelector('input[name="tipoAcrescimo"][value="nenhum"]').checked = true;
+    document.getElementById('acrescimoValor').value = '';
+    document.getElementById('acrescimoValor').disabled = true;
+    document.getElementById('acrescimoPorc').value = '';
+    document.getElementById('acrescimoPorc').disabled = true;
+
+    // 2. Preencher dados do cliente
+    if (item.dadosCliente) {
+        document.getElementById('nomeCliente').value = item.dadosCliente.nome || '';
+        document.getElementById('cpfCliente').value = item.dadosCliente.cpf || '';
+        document.getElementById('emailCliente').value = item.dadosCliente.email || '';
+        document.getElementById('telefoneCliente').value = item.dadosCliente.telefone || '';
+    }
+
+    // 3. Preencher serviços
+    if (item.servicos && item.servicos.length > 0) {
+        item.servicos.forEach((servico, idx) => {
+            let elemento;
+            if (idx === 0) {
+                elemento = listaServicos.children[0];
+            } else {
+                // Adicionar novo serviço
+                const modelo = document.querySelector('.servico-item');
+                const novo = modelo.cloneNode(true);
+                novo.querySelector('.valor-sugerido').style.display = 'none';
+                listaServicos.appendChild(novo);
+                elemento = novo;
+                
+                elemento.querySelector('.removerServico').addEventListener('click', () => {
+                    if (document.querySelectorAll('.servico-item').length > 1) {
+                        elemento.remove();
+                        calcularTotal();
+                    }
+                });
+                
+                elemento.querySelector('.tipoServico').addEventListener('change', function() {
+                    const campo = elemento.querySelector('.campo-personalizado');
+                    campo.style.display = this.value === 'Outro' ? 'flex' : 'none';
+                    calcularTotal();
+                });
+
+                elemento.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(elemento));
+            }
+
+            // Preencher dados do serviço
+            const select = elemento.querySelector('.tipoServico');
+            select.value = servico.tipo || '';
+            
+            const campoPersonalizado = elemento.querySelector('.campo-personalizado');
+            if (servico.tipo === 'Outro') {
+                campoPersonalizado.style.display = 'flex';
+                elemento.querySelector('.descricaoServico').value = servico.descricao || '';
+                elemento.querySelector('.valorServico').value = servico.valor || '';
+            } else {
+                campoPersonalizado.style.display = 'none';
+            }
+        });
+    }
+
+    // 4. Preencher ajustes (desconto e acréscimo)
+    if (item.ajustes) {
+        // Desconto
+        if (item.ajustes.tipoDesconto) {
+            document.querySelector(`input[name="tipoDesconto"][value="${item.ajustes.tipoDesconto}"]`).checked = true;
+            document.getElementById('descontoValor').disabled = item.ajustes.tipoDesconto !== 'valor';
+            document.getElementById('descontoPorc').disabled = item.ajustes.tipoDesconto !== 'porcentagem';
+            document.getElementById('descontoValor').value = item.ajustes.valorDesconto || '';
+            document.getElementById('descontoPorc').value = item.ajustes.porcDesconto || '';
+        }
+        // Acréscimo
+        if (item.ajustes.tipoAcrescimo) {
+            document.querySelector(`input[name="tipoAcrescimo"][value="${item.ajustes.tipoAcrescimo}"]`).checked = true;
+            document.getElementById('acrescimoValor').disabled = item.ajustes.tipoAcrescimo !== 'valor';
+            document.getElementById('acrescimoPorc').disabled = item.ajustes.tipoAcrescimo !== 'porcentagem';
+            document.getElementById('acrescimoValor').value = item.ajustes.valorAcrescimo || '';
+            document.getElementById('acrescimoPorc').value = item.ajustes.porcAcrescimo || '';
+        }
+    }
+
+    // 5. Recalcular tudo
+    calcularTotal();
+
+    // 6. Rolar a página para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // Disponibiliza funções globalmente
 window.excluirDoHistorico = excluirDoHistorico;
 window.baixarNovamente = baixarNovamente;
+window.reeditarOrcamento = reeditarOrcamento;
 
