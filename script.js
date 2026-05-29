@@ -1,5 +1,6 @@
 const { jsPDF } = window.jspdf;
 
+// ✅ SERVIÇOS ORIGINAIS + NOVOS ADICIONADOS
 const valoresMercado = {
     "deslocamento": 55,
     "atendimento residencial": 110,
@@ -16,7 +17,54 @@ const valoresMercado = {
     "trocar peça": 85,
     "backup": 70,
     "impressora": 125,
-    "rede cabeada": 150
+    "rede cabeada": 150,
+    // NOVOS SERVIÇOS
+    "instalação de sistema operacional": 120,
+    "configuração de servidor de arquivos": 220,
+    "manutenção de notebook": 130,
+    "troca de tela notebook": 180,
+    "instalação de placa de vídeo": 60,
+    "configuração de e-mail corporativo": 80,
+    "monitoramento de rede": 190,
+    "contrato de manutenção mensal": 350,
+    "remoção de programas indesejados": 70,
+    "otimização de desempenho": 95
+};
+
+// ✅ COMBOS DE SERVIÇOS COM DESCONTO
+const combosServicos = {
+    "Combo Manutenção Completa (Limpeza + Troca Pasta + Otimização)": {
+        servicos: ["limpeza interna", "trocar peça", "otimização de desempenho"],
+        valorOriginal: 290,
+        valorCombo: 240, // Desconto de R$50
+        desconto: 50
+    },
+    "Combo Segurança (Remoção Vírus + Backup + Firewall)": {
+        servicos: ["remover vírus", "backup"],
+        valorOriginal: 160,
+        valorCombo: 135, // Desconto de R$25
+        desconto: 25
+    },
+    "Combo Rede Completa (Wi-Fi + Cabeada + Configuração)": {
+        servicos: ["rede wi-fi", "rede cabeada"],
+        valorOriginal: 320,
+        valorCombo: 270, // Desconto de R$50
+        desconto: 50
+    },
+    "Combo Formatação Completa (Formatar + Instalar Programas + Drivers)": {
+        servicos: ["formatação", "instalação de programa"],
+        valorOriginal: 215,
+        valorCombo: 175, // Desconto de R$40
+        desconto: 40
+    }
+};
+
+// ✅ LINKS DE PAGAMENTO
+const DADOS_PAGAMENTO = {
+    linkPrincipal: "https://linknabio.gg/redkz",
+    pixLink: "https://linknabio.gg/redkz#pix",
+    cartaoLink: "https://linknabio.gg/redkz#cartao",
+    qrCodePixUrl: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://linknabio.gg/redkz#pix"
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,8 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
     aplicarMascaras();
     configurarDesconto();
     configurarAcrescimo();
+    preencherCombosNoSelect();
 
-    // ✅ CORREÇÃO AQUI: pegando o botão pelo ID e evento único
     const btnAdicionar = document.getElementById('adicionarServico');
     if (btnAdicionar) {
         btnAdicionar.addEventListener('click', () => {
@@ -51,6 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             novo.querySelector('.tipoServico').addEventListener('change', function() {
+                const valorSelecionado = this.value;
+                // Se for um combo, preenche automaticamente o valor e descrição
+                if (combosServicos[valorSelecionado]) {
+                    const combo = combosServicos[valorSelecionado];
+                    novo.querySelector('.descricaoServico').value = `${valorSelecionado} | Economia de R$ ${combo.desconto.toFixed(2).replace('.', ',')}`;
+                    novo.querySelector('.valorServico').value = combo.valorCombo.toFixed(2);
+                    novo.querySelector('.valor-sugerido').textContent = `Valor do Combo: R$ ${combo.valorCombo.toFixed(2).replace('.', ',')}`;
+                    novo.querySelector('.valor-sugerido').style.display = 'inline-block';
+                }
                 calcularTotal();
             });
 
@@ -58,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Remover do primeiro item
     document.querySelector('.removerServico').addEventListener('click', function() {
         if (document.querySelectorAll('.servico-item').length > 1) {
             this.parentElement.remove();
@@ -68,12 +124,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(document.querySelector('.servico-item')));
 
+    // ✅ NOVOS BOTÕES
     document.getElementById('gerarOrcamento').addEventListener('click', gerarOrcamento);
+    document.getElementById('gerarFaturaAprovada').addEventListener('click', () => gerarOrcamento(true));
 
     document.getElementById('exportarHistorico').addEventListener('click', exportarHistorico);
     document.getElementById('importarHistorico').addEventListener('click', () => document.getElementById('inputImportar').click());
     document.getElementById('inputImportar').addEventListener('change', importarHistorico);
 });
+
+// Adiciona os combos na lista de seleção
+function preencherCombosNoSelect() {
+    const selects = document.querySelectorAll('.tipoServico');
+    selects.forEach(select => {
+        // Adiciona um separador
+        const separador = document.createElement('optgroup');
+        separador.label = '--- 🎁 COMBOS COM DESCONTO ---';
+        select.appendChild(separador);
+
+        // Adiciona cada combo
+        Object.keys(combosServicos).forEach(nomeCombo => {
+            const opt = document.createElement('option');
+            opt.value = nomeCombo;
+            opt.textContent = `${nomeCombo} - R$ ${combosServicos[nomeCombo].valorCombo.toFixed(2).replace('.', ',')}`;
+            select.appendChild(opt);
+        });
+    });
+}
 
 function configurarDesconto() {
     const radios = document.querySelectorAll('input[name="tipoDesconto"]');
@@ -148,10 +225,18 @@ function calcularTotal() {
     let subtotal = 0;
     document.querySelectorAll('.servico-item').forEach(s => {
         const valorTexto = s.querySelector('.tipoServico').value;
-        if (valorTexto && valorTexto !== 'Outro') {
+        
+        // Verifica se é um COMBO
+        if (combosServicos[valorTexto]) {
+            subtotal += combosServicos[valorTexto].valorCombo;
+        }
+        // Verifica se é SERVIÇO NORMAL da lista
+        else if (valorTexto && valorTexto !== 'Outro') {
             const valor = parseFloat(valorTexto.split('R$ ')[1].replace(',', '.'));
             if (!isNaN(valor)) subtotal += valor;
         }
+        
+        // Adiciona valor MANUAL digitado
         const val = parseFloat(s.querySelector('.valorServico').value.replace(',', '.'));
         if (!isNaN(val)) subtotal += val;
     });
@@ -206,73 +291,113 @@ function aplicarMascaras() {
     });
 }
 
-function gerarOrcamento() {
-    const nome = document.getElementById('nomeCliente').value.trim();
-    const cpf = document.getElementById('cpfCliente').value.trim();
-    const email = document.getElementById('emailCliente').value.trim();
-    const telefone = document.getElementById('telefoneCliente').value.trim();
-    const dataHora = new Date();
-    const dataFormatada = dataHora.toLocaleString('pt-BR').replace(/[\/: ]/g, '-');
+// ✅ FUNÇÃO DE GERAR ORÇAMENTO/FATURA ATUALIZADA
+function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
+    // Se vier do histórico, usa os dados salvos
+    let dados;
+    if (dadosDoHistorico) {
+        dados = dadosDoHistorico;
+    } else {
+        // Se for novo preenchimento
+        const nome = document.getElementById('nomeCliente').value.trim();
+        const cpf = document.getElementById('cpfCliente').value.trim();
+        const email = document.getElementById('emailCliente').value.trim();
+        const telefone = document.getElementById('telefoneCliente').value.trim();
+        const observacao = document.getElementById('observacaoGeral').value.trim();
+        const status = ehFaturaAprovada ? 'APROVADO' : 'PENDENTE';
+        const dataHora = new Date();
+        const dataFormatada = dataHora.toLocaleString('pt-BR').replace(/[\/: ]/g, '-');
 
-    const dataValidade = new Date(dataHora);
-    dataValidade.setDate(dataValidade.getDate() + 3);
-    const dataValidadeTexto = dataValidade.toLocaleDateString('pt-BR');
+        const dataValidade = new Date(dataHora);
+        dataValidade.setDate(dataValidade.getDate() + 3);
+        const dataValidadeTexto = dataValidade.toLocaleDateString('pt-BR');
 
-    const subtotal = document.getElementById('subtotal').textContent;
-    const descontoTexto = document.querySelector('.valor-desconto').style.display !== 'none' ? document.getElementById('valorDesconto').textContent : '0,00';
-    const acrescimoTexto = document.querySelector('.valor-acrescimo').style.display !== 'none' ? document.getElementById('valorAcrescimo').textContent : '0,00';
-    const total = document.getElementById('valorTotal').textContent;
+        const subtotal = document.getElementById('subtotal').textContent;
+        const descontoTexto = document.querySelector('.valor-desconto').style.display !== 'none' ? document.getElementById('valorDesconto').textContent : '0,00';
+        const acrescimoTexto = document.querySelector('.valor-acrescimo').style.display !== 'none' ? document.getElementById('valorAcrescimo').textContent : '0,00';
+        const total = document.getElementById('valorTotal').textContent;
 
-    const tipoDesconto = document.querySelector('input[name="tipoDesconto"]:checked').value;
-    const valorDesconto = document.getElementById('descontoValor').value;
-    const porcDesconto = document.getElementById('descontoPorc').value;
-    const tipoAcrescimo = document.querySelector('input[name="tipoAcrescimo"]:checked').value;
-    const valorAcrescimo = document.getElementById('acrescimoValor').value;
-    const porcAcrescimo = document.getElementById('acrescimoPorc').value;
+        const tipoDesconto = document.querySelector('input[name="tipoDesconto"]:checked').value;
+        const valorDesconto = document.getElementById('descontoValor').value;
+        const porcDesconto = document.getElementById('descontoPorc').value;
+        const tipoAcrescimo = document.querySelector('input[name="tipoAcrescimo"]:checked').value;
+        const valorAcrescimo = document.getElementById('acrescimoValor').value;
+        const porcAcrescimo = document.getElementById('acrescimoPorc').value;
 
-    let nomeArquivo = 'Orcamento';
-    if (nome) nomeArquivo += `_${nome.replace(/\s/g, '_')}`;
-    nomeArquivo += `_${dataFormatada}.pdf`;
+        let nomeArquivo = ehFaturaAprovada ? `FATURA_APROVADA_` : `ORCAMENTO_`;
+        if (nome) nomeArquivo += `${nome.replace(/\s/g, '_')}_`;
+        nomeArquivo += `${dataFormatada}.pdf`;
 
-    const servicos = [];
-    document.querySelectorAll('.servico-item').forEach(s => {
-        servicos.push({
-            tipo: s.querySelector('.tipoServico').value,
-            descricao: s.querySelector('.descricaoServico').value,
-            valor: s.querySelector('.valorServico').value
+        const servicos = [];
+        document.querySelectorAll('.servico-item').forEach(s => {
+            servicos.push({
+                tipo: s.querySelector('.tipoServico').value,
+                descricao: s.querySelector('.descricaoServico').value,
+                valor: s.querySelector('.valorServico').value
+            });
         });
-    });
 
-    if (servicos.every(s => !s.tipo && !s.descricao)) {
-        alert('Adicione pelo menos um serviço!');
-        return;
+        if (servicos.every(s => !s.tipo && !s.descricao)) {
+            alert('Adicione pelo menos um serviço!');
+            return;
+        }
+
+        dados = {
+            nomeArquivo, dataHora, dataValidadeTexto,
+            dadosCliente: { nome, cpf, email, telefone },
+            observacao, status,
+            servicos,
+            valores: { subtotal, descontoTexto, acrescimoTexto, total },
+            ajustes: { tipoDesconto, valorDesconto, porcDesconto, tipoAcrescimo, valorAcrescimo, porcAcrescimo }
+        };
+        salvarNoHistorico(dados);
     }
 
+    // === GERAÇÃO DO PDF ===
     const doc = new jsPDF();
-    
+    const titulo = ehFaturaAprovada ? "FATURA DE SERVIÇOS - APROVADA" : "ORÇAMENTO DE SERVIÇOS DE INFORMÁTICA";
+    const corStatus = dados.status === 'APROVADO' ? [39, 174, 96] : [241, 196, 15];
+
+    // Cabeçalho
     doc.setFillColor(44, 62, 80);
     doc.rect(0, 0, 210, 40, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.setFont('bold');
-    doc.text('ORÇAMENTO DE SERVIÇOS DE INFORMÁTICA', 105, 25, { align: 'center' });
+    doc.text(titulo, 105, 25, { align: 'center' });
     
+    // Status
+    doc.setFillColor(...corStatus);
+    doc.roundedRect(140, 42, 50, 12, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.text(dados.status, 165, 50, { align: 'center' });
+
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(12);
     doc.setFont('normal');
-    doc.text(`Data/Hora: ${dataHora.toLocaleString('pt-BR')}`, 20, 50);
+    doc.text(`Data/Hora: ${new Date(dados.dataHora).toLocaleString('pt-BR')}`, 20, 50);
 
     let y = 60;
-    if (nome) { doc.text(`Cliente: ${nome}`, 20, y); y += 8; }
-    if (cpf) { doc.text(`CPF: ${cpf}`, 20, y); y += 8; }
-    if (email) { doc.text(`E-mail: ${email}`, 20, y); y += 8; }
-    if (telefone) { doc.text(`Telefone: ${telefone}`, 20, y); y += 12; }
+    if (dados.dadosCliente.nome) { doc.text(`Cliente: ${dados.dadosCliente.nome}`, 20, y); y += 8; }
+    if (dados.dadosCliente.cpf) { doc.text(`CPF: ${dados.dadosCliente.cpf}`, 20, y); y += 8; }
+    if (dados.dadosCliente.email) { doc.text(`E-mail: ${dados.dadosCliente.email}`, 20, y); y += 8; }
+    if (dados.dadosCliente.telefone) { doc.text(`Telefone: ${dados.dadosCliente.telefone}`, 20, y); y += 12; }
+
+    // Observação
+    if (dados.observacao) {
+        doc.setFont('bold');
+        doc.text("📝 Observações:", 20, y);
+        doc.setFont('normal');
+        doc.text(dados.observacao, 20, y + 8, { maxWidth: 170 });
+        y += 15;
+    }
 
     doc.setFont('bold');
     doc.text('SERVIÇOS PRESTADOS:', 20, y);
     doc.setFont('normal');
     y += 10;
-    servicos.forEach(s => {
+    dados.servicos.forEach(s => {
         let texto = s.tipo || '';
         if (s.descricao) texto += ` | ${s.descricao}`;
         if (s.valor) texto += ` - R$ ${s.valor}`;
@@ -281,18 +406,18 @@ function gerarOrcamento() {
     });
 
     y += 5;
-    doc.text(`Subtotal: R$ ${subtotal}`, 20, y);
+    doc.text(`Subtotal: R$ ${dados.valores.subtotal}`, 20, y);
     
-    if (descontoTexto !== '0,00') {
+    if (dados.valores.descontoTexto !== '0,00') {
         doc.setTextColor(192, 57, 43);
-        doc.text(`Desconto: - R$ ${descontoTexto}`, 20, y + 8);
+        doc.text(`Desconto: - R$ ${dados.valores.descontoTexto}`, 20, y + 8);
         doc.setTextColor(0, 0, 0);
         y += 8;
     }
 
-    if (acrescimoTexto !== '0,00') {
+    if (dados.valores.acrescimoTexto !== '0,00') {
         doc.setTextColor(41, 128, 185);
-        doc.text(`Acréscimo: + R$ ${acrescimoTexto}`, 20, y + 8);
+        doc.text(`Acréscimo: + R$ ${dados.valores.acrescimoTexto}`, 20, y + 8);
         doc.setTextColor(0, 0, 0);
         y += 8;
     }
@@ -301,25 +426,42 @@ function gerarOrcamento() {
     doc.rect(15, y + 5, 180, 20, 'F');
     doc.setFontSize(14);
     doc.setFont('bold');
-    doc.text(`VALOR FINAL: R$ ${total}`, 20, y + 18);
+    doc.text(`VALOR FINAL: R$ ${dados.valores.total}`, 20, y + 18);
+
+    // ✅ SE FOR FATURA APROVADA: ADICIONA DADOS DE PAGAMENTO
+    if (ehFaturaAprovada) {
+        y += 30;
+        doc.setFillColor(245, 245, 245);
+        doc.rect(15, y, 180, 80, 'F');
+        doc.setFontSize(16);
+        doc.setTextColor(44, 62, 80);
+        doc.text("💳 FORMAS DE PAGAMENTO", 105, y + 10, { align: 'center' });
+        
+        // Link Principal
+        doc.setFontSize(11);
+        doc.text(`Acesse: ${DADOS_PAGAMENTO.linkPrincipal}`, 105, y + 22, { align: 'center' });
+        
+        // QR Code e Links
+        doc.addImage(DADOS_PAGAMENTO.qrCodePixUrl, 'PNG', 25, y + 30, 40, 40);
+        doc.text("Pagamento PIX", 45, y + 78, { align: 'center' });
+
+        doc.text("Ou pague diretamente:", 100, y + 45);
+        doc.setTextColor(52, 152, 219);
+        doc.textWithLink("🔗 Pagar com PIX", 100, y + 55, { url: DADOS_PAGAMENTO.pixLink });
+        doc.textWithLink("🔗 Pagar com Cartão de Crédito", 100, y + 65, { url: DADOS_PAGAMENTO.cartaoLink });
+        doc.setTextColor(0,0,0);
+    }
 
     doc.setFontSize(11);
     doc.setTextColor(80, 80, 80);
-    doc.text(`Válido até: ${dataValidadeTexto} (3 dias)`, 20, 275);
+    doc.text(`Válido até: ${dados.dataValidadeTexto} (3 dias)`, 20, 275);
 
     doc.setFont('Permanent Marker', 'cursive');
     doc.setFontSize(22);
     doc.setTextColor(44, 62, 80);
     doc.text('RDTech', 160, 285, { align: 'right' });
 
-    doc.save(nomeArquivo);
-    
-    salvarNoHistorico({
-        nomeArquivo, dataHora,
-        dadosCliente: { nome, cpf, email, telefone },
-        servicos,
-        ajustes: { tipoDesconto, valorDesconto, porcDesconto, tipoAcrescimo, valorAcrescimo, porcAcrescimo }
-    });
+    doc.save(dados.nomeArquivo);
 }
 
 function salvarNoHistorico(item) {
@@ -338,15 +480,43 @@ function carregarHistorico() {
     historico.forEach((item, index) => {
         const li = document.createElement('li');
         const nome = (item.dadosCliente && item.dadosCliente.nome) ? `Cliente: ${item.dadosCliente.nome}` : 'Cliente não informado';
+        const corStatus = item.status === 'APROVADO' ? '#27ae60' : item.status === 'RECUSADO' ? '#e74c3c' : '#f39c12';
+        
         li.innerHTML = `
-            <div><strong>${nome}</strong><br><small>${item.nomeArquivo} | ${item.dataHora}</small></div>
-            <div style="margin-top:8px;">
-                <button onclick="reeditarOrcamento(${index})" style="background:#27ae60;color:white;border:none;padding:8px 12px;border-radius:4px;margin-right:5px;">✏️ Editar</button>
-                <button onclick="excluirDoHistorico(${index})" style="background:#e74c3c;color:white;border:none;padding:8px 12px;border-radius:4px;">🗑 Excluir</button>
+            <div>
+                <strong>${nome}</strong>
+                <span style="background:${corStatus}; color:white; padding:2px 6px; border-radius:4px; font-size:11px; margin-left:8px;">${item.status || 'PENDENTE'}</span>
+                <br><small>${item.nomeArquivo} | ${new Date(item.dataHora).toLocaleString('pt-BR')}</small>
+            </div>
+            <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">
+                <button onclick="reeditarOrcamento(${index})" style="background:#2980b9;color:white;border:none;padding:6px 8px;border-radius:4px;">✏️ Editar</button>
+                <button onclick="gerarFaturaDoHistorico(${index})" style="background:#27ae60;color:white;border:none;padding:6px 8px;border-radius:4px;">✅ Gerar Fatura</button>
+                <button onclick="marcarComoRecusado(${index})" style="background:#e67e22;color:white;border:none;padding:6px 8px;border-radius:4px;">❌ Recusar</button>
+                <button onclick="excluirDoHistorico(${index})" style="background:#e74c3c;color:white;border:none;padding:6px 8px;border-radius:4px;">🗑 Excluir</button>
             </div>
         `;
         lista.appendChild(li);
     });
+}
+
+// ✅ FUNÇÕES NOVAS DO HISTÓRICO
+function gerarFaturaDoHistorico(index) {
+    const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
+    const item = historico[index];
+    if (item) {
+        item.status = 'APROVADO';
+        gerarOrcamento(true, item);
+        salvarNoHistorico(item); // Atualiza status
+    }
+}
+
+function marcarComoRecusado(index) {
+    const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
+    if (historico[index]) {
+        historico[index].status = 'RECUSADO';
+        localStorage.setItem('orcamentos', JSON.stringify(historico));
+        carregarHistorico();
+    }
 }
 
 function excluirDoHistorico(index) {
@@ -365,6 +535,7 @@ function reeditarOrcamento(index) {
     document.getElementById('cpfCliente').value = item.dadosCliente?.cpf || '';
     document.getElementById('emailCliente').value = item.dadosCliente?.email || '';
     document.getElementById('telefoneCliente').value = item.dadosCliente?.telefone || '';
+    document.getElementById('observacaoGeral').value = item.observacao || '';
     
     const listaServicos = document.getElementById('listaServicos');
     while (listaServicos.children.length > 1) listaServicos.removeChild(listaServicos.lastChild);
@@ -460,4 +631,6 @@ window.excluirDoHistorico = excluirDoHistorico;
 window.reeditarOrcamento = reeditarOrcamento;
 window.exportarHistorico = exportarHistorico;
 window.importarHistorico = importarHistorico;
-
+window.gerarFaturaDoHistorico = gerarFaturaDoHistorico;
+window.marcarComoRecusado = marcarComoRecusado;
+                
