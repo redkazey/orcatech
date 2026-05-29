@@ -518,3 +518,4 @@ window.exportarHistorico = exportarHistorico;
 window.importarHistorico = importarHistorico;
 window.salvarNoGithub = salvarNoGithub;
 window.carregarDoGithub = carregarDoGithub;
+
