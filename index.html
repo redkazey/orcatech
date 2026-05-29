@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento de Serviços de Informática</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Orçamento de Serviços de Informática</h1>
+        </header>
+
+        <section class="formulario">
+            <h2>Dados do Cliente</h2>
+            <input type="text" id="nomeCliente" placeholder="Nome completo (opcional)">
+            <input type="text" id="cpfCliente" placeholder="CPF (opcional)">
+            <input type="email" id="emailCliente" placeholder="E-mail (opcional)">
+            <input type="tel" id="telefoneCliente" placeholder="Telefone (opcional)">
+
+            <h2>Serviços</h2>
+            <div id="listaServicos">
+                <div class="servico">
+                    <select class="tipoServico">
+                        <option value="">Selecione um serviço</option>
+                        <option value="Instalação de Software - R$ 80,00">Instalação de Software - R$ 80,00</option>
+                        <option value="Formatação e Instalação de Sistema - R$ 150,00">Formatação e Instalação de Sistema - R$ 150,00</option>
+                        <option value="Manutenção de Computador - R$ 120,00">Manutenção de Computador - R$ 120,00</option>
+                        <option value="Configuração de Rede - R$ 180,00">Configuração de Rede - R$ 180,00</option>
+                        <option value="Remoção de Vírus e Malwares - R$ 100,00">Remoção de Vírus e Malwares - R$ 100,00</option>
+                        <option value="Outro">Outro (personalizado)</option>
+                    </select>
+                    <input type="text" class="descricaoExtra" placeholder="Descrição e valor (ex: Consultoria - R$ 200,00)" style="display: none;">
+                    <button type="button" class="removerServico">×</button>
+                </div>
+            </div>
+            <button type="button" id="adicionarServico">+ Adicionar Serviço</button>
+
+            <div class="total">
+                <h3>Valor Total: R$ <span id="valorTotal">0,00</span></h3>
+            </div>
+
+            <button type="button" id="gerarOrcamento">Gerar Orçamento e Salvar</button>
+        </section>
+
+        <section class="historico">
+            <h2>Histórico de Orçamentos</h2>
+            <ul id="listaHistorico"></ul>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
