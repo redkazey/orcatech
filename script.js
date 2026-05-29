@@ -1,7 +1,8 @@
 const { jsPDF } = window.jspdf;
 
-// ✅ SERVIÇOS ORIGINAIS + NOVOS ADICIONADOS
+// ✅ MUITOS MAIS SERVIÇOS ADICIONADOS
 const valoresMercado = {
+    // ORIGINAIS
     "deslocamento": 55,
     "atendimento residencial": 110,
     "atendimento empresarial": 130,
@@ -18,44 +19,87 @@ const valoresMercado = {
     "backup": 70,
     "impressora": 125,
     "rede cabeada": 150,
-    // NOVOS SERVIÇOS
+    // NOVOS ADICIONADOS
     "instalação de sistema operacional": 120,
     "configuração de servidor de arquivos": 220,
     "manutenção de notebook": 130,
     "troca de tela notebook": 180,
+    "troca de teclado notebook": 120,
+    "troca de bateria notebook": 90,
+    "troca de carcaça notebook": 150,
     "instalação de placa de vídeo": 60,
+    "instalação de memória ram": 40,
+    "instalação de hd/ssd": 45,
+    "troca de pasta térmica": 50,
     "configuração de e-mail corporativo": 80,
     "monitoramento de rede": 190,
     "contrato de manutenção mensal": 350,
     "remoção de programas indesejados": 70,
-    "otimização de desempenho": 95
+    "otimização de desempenho": 95,
+    "configuração de firewall": 140,
+    "instalação de antivírus": 85,
+    "configuração de vpn": 110,
+    "mapeamento de rede": 130,
+    "instalação de switch": 75,
+    "configuração de roteador": 80,
+    "instalação de servidor nuvem": 280,
+    "migração de dados": 160,
+    "clonagem de hd": 100,
+    "desbloqueio de bios": 95,
+    "reparo de placa mãe": 200,
+    "reparo de fonte de alimentação": 110,
+    "configuração de impressora em rede": 140,
+    "instalação de sistema de segurança": 230,
+    "auditoria de segurança": 300,
+    "consultoria em ti": 150,
+    "instalação de servidor de backup": 260,
+    "configuração de domínio": 180,
+    "criação de usuário e permissões": 60,
+    "restauração de sistema": 120,
+    "limpeza de software": 65,
+    "atualização de bios": 80,
+    "configuração de acessos remotos": 90,
+    "instalação de cabo de rede": 35,
+    "teste de cabeamento": 50
 };
 
 // ✅ COMBOS DE SERVIÇOS COM DESCONTO
 const combosServicos = {
     "Combo Manutenção Completa (Limpeza + Troca Pasta + Otimização)": {
-        servicos: ["limpeza interna", "trocar peça", "otimização de desempenho"],
+        servicos: ["limpeza interna", "troca de pasta térmica", "otimização de desempenho"],
         valorOriginal: 290,
         valorCombo: 240, // Desconto de R$50
         desconto: 50
     },
-    "Combo Segurança (Remoção Vírus + Backup + Firewall)": {
-        servicos: ["remover vírus", "backup"],
-        valorOriginal: 160,
-        valorCombo: 135, // Desconto de R$25
-        desconto: 25
-    },
-    "Combo Rede Completa (Wi-Fi + Cabeada + Configuração)": {
-        servicos: ["rede wi-fi", "rede cabeada"],
-        valorOriginal: 320,
-        valorCombo: 270, // Desconto de R$50
+    "Combo Segurança (Remoção Vírus + Backup + Antivírus)": {
+        servicos: ["remover vírus", "backup", "instalação de antivírus"],
+        valorOriginal: 245,
+        valorCombo: 195, // Desconto de R$50
         desconto: 50
     },
+    "Combo Rede Completa (Wi-Fi + Cabeada + Configuração)": {
+        servicos: ["rede wi-fi", "rede cabeada", "configuração de roteador"],
+        valorOriginal: 400,
+        valorCombo: 330, // Desconto de R$70
+        desconto: 70
+    },
     "Combo Formatação Completa (Formatar + Instalar Programas + Drivers)": {
-        servicos: ["formatação", "instalação de programa"],
-        valorOriginal: 215,
-        valorCombo: 175, // Desconto de R$40
-        desconto: 40
+        servicos: ["formatação", "instalação de programa", "instalação de sistema operacional"],
+        valorOriginal: 335,
+        valorCombo: 270, // Desconto de R$65
+        desconto: 65
+    },
+    "Combo Upgrade PC (Memória + SSD + Instalação + Configuração)": {
+        servicos: ["instalação de memória ram", "instalação de hd/ssd", "otimização de desempenho"],
+        valorOriginal: 180,
+        valorCombo: 145, // Desconto de R$35
+        desconto: 35
+    },
+    "Combo Suporte Empresarial (Atendimento + Rede + Servidor)": {
+        servicos: ["atendimento empresarial", "rede cabeada", "servidor"],
+        valorOriginal: 530,
+        valorCombo: 450, // Desconto de R$80
+        desconto: 80
     }
 };
 
@@ -89,6 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
             novo.querySelector('.valorServico').value = '';
             novo.querySelector('.valor-sugerido').style.display = 'none';
             
+            // ✅ LIBERAR EDIÇÃO DO VALOR SEMPRE
+            novo.querySelector('.valorServico').disabled = false;
+            
             container.appendChild(novo);
 
             novo.querySelector('.removerServico').addEventListener('click', () => {
@@ -100,18 +147,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
             novo.querySelector('.tipoServico').addEventListener('change', function() {
                 const valorSelecionado = this.value;
-                // Se for um combo, preenche automaticamente o valor e descrição
+                const inputValor = novo.querySelector('.valorServico');
+                
+                // Se for um combo, preenche valor mas DEIXA EDITÁVEL
                 if (combosServicos[valorSelecionado]) {
                     const combo = combosServicos[valorSelecionado];
                     novo.querySelector('.descricaoServico').value = `${valorSelecionado} | Economia de R$ ${combo.desconto.toFixed(2).replace('.', ',')}`;
-                    novo.querySelector('.valorServico').value = combo.valorCombo.toFixed(2);
+                    inputValor.value = combo.valorCombo.toFixed(2);
                     novo.querySelector('.valor-sugerido').textContent = `Valor do Combo: R$ ${combo.valorCombo.toFixed(2).replace('.', ',')}`;
                     novo.querySelector('.valor-sugerido').style.display = 'inline-block';
+                }
+                // Se for serviço normal, preenche valor mas DEIXA EDITÁVEL
+                else if (valorSelecionado && valorSelecionado !== 'Outro') {
+                    const valor = parseFloat(valorSelecionado.split('R$ ')[1].replace(',', '.'));
+                    if (!isNaN(valor)) {
+                        inputValor.value = valor.toFixed(2);
+                        novo.querySelector('.valor-sugerido').textContent = `Valor sugerido: R$ ${valor.toFixed(2).replace('.', ',')}`;
+                        novo.querySelector('.valor-sugerido').style.display = 'inline-block';
+                    }
+                } else {
+                    novo.querySelector('.valor-sugerido').style.display = 'none';
                 }
                 calcularTotal();
             });
 
             novo.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(novo));
+            
+            // ✅ RECALCULAR QUANDO EDITAR VALOR MANUALMENTE
+            novo.querySelector('.valorServico').addEventListener('input', calcularTotal);
         });
     }
 
@@ -123,6 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(document.querySelector('.servico-item')));
+    
+    // ✅ RECALCULAR QUANDO EDITAR VALOR DO PRIMEIRO ITEM
+    document.querySelector('.valorServico').addEventListener('input', calcularTotal);
 
     // ✅ NOVOS BOTÕES
     document.getElementById('gerarOrcamento').addEventListener('click', gerarOrcamento);
@@ -206,9 +272,11 @@ function buscarValor(container) {
     }
 
     let valorEncontrado = null;
+    let nomeServicoEncontrado = '';
     for (const [chave, valor] of Object.entries(valoresMercado)) {
         if (descricao.includes(chave)) {
             valorEncontrado = valor;
+            nomeServicoEncontrado = chave;
             break;
         }
     }
@@ -218,25 +286,16 @@ function buscarValor(container) {
     elementoValor.textContent = valorEncontrado.toFixed(2).replace('.', ',');
     elementoDisplay.style.display = 'inline-block';
     inputValor.value = valorEncontrado.toFixed(2);
+    // ✅ CAMPO SEMPRE EDITÁVEL
+    inputValor.disabled = false;
+    
     calcularTotal();
 }
 
 function calcularTotal() {
     let subtotal = 0;
     document.querySelectorAll('.servico-item').forEach(s => {
-        const valorTexto = s.querySelector('.tipoServico').value;
-        
-        // Verifica se é um COMBO
-        if (combosServicos[valorTexto]) {
-            subtotal += combosServicos[valorTexto].valorCombo;
-        }
-        // Verifica se é SERVIÇO NORMAL da lista
-        else if (valorTexto && valorTexto !== 'Outro') {
-            const valor = parseFloat(valorTexto.split('R$ ')[1].replace(',', '.'));
-            if (!isNaN(valor)) subtotal += valor;
-        }
-        
-        // Adiciona valor MANUAL digitado
+        // ✅ PEGA SEMPRE O VALOR DIGITADO PELO USUÁRIO (mesmo que seja de combo/serviço)
         const val = parseFloat(s.querySelector('.valorServico').value.replace(',', '.'));
         if (!isNaN(val)) subtotal += val;
     });
@@ -331,14 +390,14 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
         const servicos = [];
         document.querySelectorAll('.servico-item').forEach(s => {
             servicos.push({
-                tipo: s.querySelector('.tipoServico').value,
-                descricao: s.querySelector('.descricaoServico').value,
+                tipo: s.querySelector('.tipoServico').value || 'Serviço Personalizado',
+                descricao: s.querySelector('.descricaoServico').value || 'Sem descrição',
                 valor: s.querySelector('.valorServico').value
             });
         });
 
-        if (servicos.every(s => !s.tipo && !s.descricao)) {
-            alert('Adicione pelo menos um serviço!');
+        if (servicos.every(s => !s.valor || parseFloat(s.valor) === 0)) {
+            alert('Adicione pelo menos um serviço com valor!');
             return;
         }
 
@@ -398,7 +457,7 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
     doc.setFont('normal');
     y += 10;
     dados.servicos.forEach(s => {
-        let texto = s.tipo || '';
+        let texto = s.tipo;
         if (s.descricao) texto += ` | ${s.descricao}`;
         if (s.valor) texto += ` - R$ ${s.valor}`;
         doc.text(`• ${texto}`, 22, y);
@@ -446,7 +505,7 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
         doc.text("Pagamento PIX", 45, y + 78, { align: 'center' });
 
         doc.text("Ou pague diretamente:", 100, y + 45);
-        doc.setTextColor(52, 152, 219);
+        doc.setTextColor(52,  152, 219);
         doc.textWithLink("🔗 Pagar com PIX", 100, y + 55, { url: DADOS_PAGAMENTO.pixLink });
         doc.textWithLink("🔗 Pagar com Cartão de Crédito", 100, y + 65, { url: DADOS_PAGAMENTO.cartaoLink });
         doc.setTextColor(0,0,0);
@@ -565,10 +624,13 @@ function reeditarOrcamento(index) {
                     if (document.querySelectorAll('.servico-item').length > 1) { el.remove(); calcularTotal(); }
                 });
                 el.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(el));
+                // ✅ LIBERAR EDIÇÃO AO RECARREGAR
+                el.querySelector('.valorServico').addEventListener('input', calcularTotal);
             }
             el.querySelector('.tipoServico').value = servico.tipo || '';
             el.querySelector('.descricaoServico').value = servico.descricao || '';
             el.querySelector('.valorServico').value = servico.valor || '';
+            el.querySelector('.valorServico').disabled = false; // SEMPRE EDITÁVEL
         });
     }
 
@@ -633,4 +695,4 @@ window.exportarHistorico = exportarHistorico;
 window.importarHistorico = importarHistorico;
 window.gerarFaturaDoHistorico = gerarFaturaDoHistorico;
 window.marcarComoRecusado = marcarComoRecusado;
-                
+
