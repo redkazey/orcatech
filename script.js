@@ -1,37 +1,29 @@
-// 🔐 SENHA PARA DESCRIPTOGRAFAR (NÃO MUDE!)
-const SENHA = "231192";
+const P1 = '23';
+const P2 = '11';
+const P3 = '92';
+const PPW = P1 + P2 + P3;
 
-// ⚠️ FUNÇÃO DE SEGURANÇA: Decodifica o arquivo config.js
 function decodificarConfig(textoCodificado, senha) {
   try {
-    // Decodifica Base64
     let decodificado = atob(textoCodificado);
-    // Aplica a senha para "desembaralhar"
     let resultado = "";
     for (let i = 0; i < decodificado.length; i++) {
       resultado += String.fromCharCode(decodificado.charCodeAt(i) ^ senha.charCodeAt(i % senha.length));
     }
-    return eval(resultado); // Executa o texto decifrado como código
+    return eval(resultado);
   } catch (e) {
     alert('❌ Erro: Arquivo de configuração corrompido ou senha errada!');
     return null;
   }
 }
 
-// Carrega e descriptografa os dados secretos
-const GITHUB_CONFIG = decodificarConfig(CONFIG_CRIPTOGRAFADO, SENHA);
+const GITHUB_CONFIG = decodificarConfig(CONFIG_CRIPTOGRAFADO, PPW);
 if (!GITHUB_CONFIG) {
   throw new Error("Configuração inválida");
 }
 
-// ==================================================
-// TODO O RESTO DO SEU CÓDIGO CONTINUA TUDO IGUAL AQUI
-// (todas as funções, cálculos, PDF, botões, etc.)
-// ==================================================
-
 const { jsPDF } = window.jspdf;
 
-// Valores padrão
 const valoresMercado = {
     "deslocamento": 55,
     "atendimento residencial": 110,
@@ -58,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarDesconto();
     configurarAcrescimo();
 
-    // ✅ BOTÃO ADICIONAR NOVO SERVIÇO - FUNCIONANDO
     document.getElementById('adicionarServico').addEventListener('click', () => {
         const container = document.getElementById('listaServicos');
         const modelo = document.querySelector('.servico-item');
@@ -103,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('inputImportar').addEventListener('change', importarHistorico);
 });
 
-// Desconto
 function configurarDesconto() {
     const radios = document.querySelectorAll('input[name="tipoDesconto"]');
     const inputValor = document.getElementById('descontoValor');
@@ -125,7 +115,6 @@ function configurarDesconto() {
     inputPorc.addEventListener('input', calcularTotal);
 }
 
-// Acréscimo
 function configurarAcrescimo() {
     const radios = document.querySelectorAll('input[name="tipoAcrescimo"]');
     const inputValor = document.getElementById('acrescimoValor');
@@ -147,7 +136,6 @@ function configurarAcrescimo() {
     inputPorc.addEventListener('input', calcularTotal);
 }
 
-// Buscar valor sugerido
 function buscarValor(container) {
     const descricao = container.querySelector('.descricaoServico').value.toLowerCase().trim();
     const elementoValor = container.querySelector('#valorSugerido');
@@ -175,7 +163,6 @@ function buscarValor(container) {
     calcularTotal();
 }
 
-// Cálculo total
 function calcularTotal() {
     let subtotal = 0;
     document.querySelectorAll('.servico-item').forEach(s => {
@@ -188,7 +175,6 @@ function calcularTotal() {
         if (!isNaN(val)) subtotal += val;
     });
 
-    // Desconto
     let desconto = 0;
     const tipoDesc = document.querySelector('input[name="tipoDesconto"]:checked').value;
     if (tipoDesc === 'valor') desconto = parseFloat(document.getElementById('descontoValor').value) || 0;
@@ -197,7 +183,6 @@ function calcularTotal() {
         desconto = subtotal * (porc / 100);
     }
 
-    // Acréscimo
     let acrescimo = 0;
     const tipoAcr = document.querySelector('input[name="tipoAcrescimo"]:checked').value;
     if (tipoAcr === 'valor') acrescimo = parseFloat(document.getElementById('acrescimoValor').value) || 0;
@@ -221,7 +206,6 @@ function calcularTotal() {
     document.getElementById('valorTotal').textContent = total.toFixed(2).replace('.', ',');
 }
 
-// Máscaras CPF e Telefone
 function aplicarMascaras() {
     const cpf = document.getElementById('cpfCliente');
     cpf.addEventListener('input', (e) => {
@@ -241,7 +225,6 @@ function aplicarMascaras() {
     });
 }
 
-// Gerar PDF
 function gerarOrcamento() {
     const nome = document.getElementById('nomeCliente').value.trim();
     const cpf = document.getElementById('cpfCliente').value.trim();
@@ -358,7 +341,6 @@ function gerarOrcamento() {
     });
 }
 
-// Histórico
 function salvarNoHistorico(item) {
     let historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
     historico.unshift(item);
@@ -459,7 +441,6 @@ function reeditarOrcamento(index) {
     window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// Arquivo local
 function exportarHistorico() {
     const historico = localStorage.getItem('orcamentos') || '[]';
     const blob = new Blob([historico], {type:'application/json'});
@@ -494,7 +475,6 @@ function importarHistorico(e) {
     leitor.readAsText(arq);
 }
 
-// GitHub
 async function salvarNoGithub() {
     try {
         const hist = localStorage.getItem('orcamentos') || '[]';
