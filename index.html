@@ -100,21 +100,21 @@
                         <option value="Consultoria em TI - R$ 150,00">Consultoria em TI - R$ 150,00</option>
                         <option value="Instalação de Servidor de Backup - R$ 260,00">Instalação de Servidor de Backup - R$ 260,00</option>
                         <option value="Configuração de Domínio - R$ 180,00">Configuração de Domínio - R$ 180,00</option>
-<option value="Criação de Usuário e Permissões - R$ 60,00">Criação de Usuário e Permissões - R$ 60,00</option>
-<option value="Restauração de Sistema - R$ 120,00">Restauração de Sistema - R$ 120,00</option>
-<option value="Limpeza de Software - R$ 65,00">Limpeza de Software - R$ 65,00</option>
-<option value="Atualização de BIOS - R$ 80,00">Atualização de BIOS - R$ 80,00</option>
-<option value="Configuração de Acessos Remotos - R$ 90,00">Configuração de Acessos Remotos - R$ 90,00</option>
-<option value="Instalação de Cabo de Rede - R$ 35,00">Instalação de Cabo de Rede - R$ 35,00</option>
-<option value="Teste de Cabeamento - R$ 50,00">Teste de Cabeamento - R$ 50,00</option>
-<option value="Configuração de Proxy - R$ 120,00">Configuração de Proxy - R$ 120,00</option>
-<option value="Instalação de Nobreak - R$ 90,00">Instalação de Nobreak - R$ 90,00</option>
-<option value="Calibração de Bateria - R$ 40,00">Calibração de Bateria - R$ 40,00</option>
-<option value="Recuperação de Senha - R$ 70,00">Recuperação de Senha - R$ 70,00</option>
-<option value="Configuração de HD Externo - R$ 55,00">Configuração de HD Externo - R$ 55,00</option>
-<option value="Instalação de Leitor de Código de Barras - R$ 85,00">Instalação de Leitor de Código de Barras - R$ 85,00</option>
-<option value="Manutenção de Estação de Trabalho - R$ 160,00">Manutenção de Estação de Trabalho - R$ 160,00</option>
-<option value="Outro">Outro (Serviço Personalizado)</option>
+                        <option value="Criação de Usuário e Permissões - R$ 60,00">Criação de Usuário e Permissões - R$ 60,00</option>
+                        <option value="Restauração de Sistema - R$ 120,00">Restauração de Sistema - R$ 120,00</option>
+                        <option value="Limpeza de Software - R$ 65,00">Limpeza de Software - R$ 65,00</option>
+                        <option value="Atualização de BIOS - R$ 80,00">Atualização de BIOS - R$ 80,00</option>
+                        <option value="Configuração de Acessos Remotos - R$ 90,00">Configuração de Acessos Remotos - R$ 90,00</option>
+                        <option value="Instalação de Cabo de Rede - R$ 35,00">Instalação de Cabo de Rede - R$ 35,00</option>
+                        <option value="Teste de Cabeamento - R$ 50,00">Teste de Cabeamento - R$ 50,00</option>
+                        <option value="Configuração de Proxy - R$ 120,00">Configuração de Proxy - R$ 120,00</option>
+                        <option value="Instalação de Nobreak - R$ 90,00">Instalação de Nobreak - R$ 90,00</option>
+                        <option value="Calibração de Bateria - R$ 40,00">Calibração de Bateria - R$ 40,00</option>
+                        <option value="Recuperação de Senha - R$ 70,00">Recuperação de Senha - R$ 70,00</option>
+                        <option value="Configuração de HD Externo - R$ 55,00">Configuração de HD Externo - R$ 55,00</option>
+                        <option value="Instalação de Leitor de Código de Barras - R$ 85,00">Instalação de Leitor de Código de Barras - R$ 85,00</option>
+                        <option value="Manutenção de Estação de Trabalho - R$ 160,00">Manutenção de Estação de Trabalho - R$ 160,00</option>
+                        <option value="Outro">Outro (Serviço Personalizado)</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -175,19 +175,19 @@
 
         <div class="mt-6 p-4 bg-gray-50 rounded-lg">
             <div class="flex justify-between items-center mb-1">
-                <span>Subtotal:</span>
+                <span>Subtotal</span>
                 <span>R$ <span id="subtotal">0,00</span></span>
             </div>
             <div class="flex justify-between items-center mb-1 text-red-600 valor-desconto" style="display: none;">
-                <span>Desconto:</span>
+                <span>Desconto</span>
                 <span>- R$ <span id="valorDesconto">0,00</span></span>
             </div>
             <div class="flex justify-between items-center mb-1 text-blue-600 valor-acrescimo" style="display: none;">
-                <span>Acréscimo:</span>
+                <span>Acréscimo</span>
                 <span>+ R$ <span id="valorAcrescimo">0,00</span></span>
             </div>
             <div class="flex justify-between items-center font-bold text-lg text-green-700 border-t border-gray-300 pt-2 mt-2">
-                <span>VALOR TOTAL:</span>
+                <span>VALOR TOTAL</span>
                 <span>R$ <span id="valorTotal">0,00</span></span>
             </div>
         </div>
@@ -210,6 +210,12 @@
 
         <ul id="listaHistorico" class="space-y-3">
             <li id="vazioHistorico" class="text-gray-500 italic text-center py-4">Nenhum orçamento salvo ainda.</li>
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
         </ul>
     </div>
 
