@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orçamento de Serviços de Informática</title>
+    <title>Orçamento de Serviços - RDTech</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -35,6 +35,12 @@
                 <input type="text" id="telefoneCliente" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
         </div>
+
+        <!-- ✅ CAMPO DE OBSERVAÇÃO ADICIONADO -->
+        <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-600 mb-1">📝 Observações Gerais</label>
+            <textarea id="observacaoGeral" rows="3" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Informações adicionais, condições, prazos, materiais inclusos..."></textarea>
+        </div>
     </div>
 
     <div class="bg-white rounded-lg shadow p-6 mb-6">
@@ -42,7 +48,7 @@
         <div id="listaServicos">
             <div class="servico-item border-b border-gray-200 pb-4 mb-4">
                 <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Tipo de Serviço</label>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Tipo de Serviço / Combo</label>
                     <select class="tipoServico w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">Escolha...</option>
                         <option value="Deslocamento - R$ 55,00">Deslocamento - R$ 55,00</option>
@@ -61,6 +67,16 @@
                         <option value="Backup de Arquivos - R$ 70,00">Backup de Arquivos - R$ 70,00</option>
                         <option value="Instalação/Manutenção Impressora - R$ 125,00">Instalação/Manutenção Impressora - R$ 125,00</option>
                         <option value="Rede Cabeada / Instalação Cabos - R$ 150,00">Rede Cabeada / Instalação Cabos - R$ 150,00</option>
+                        <option value="Instalação de Sistema Operacional - R$ 120,00">Instalação de Sistema Operacional - R$ 120,00</option>
+                        <option value="Configuração de Servidor de Arquivos - R$ 220,00">Configuração de Servidor de Arquivos - R$ 220,00</option>
+                        <option value="Manutenção de Notebook - R$ 130,00">Manutenção de Notebook - R$ 130,00</option>
+                        <option value="Troca de Tela Notebook - R$ 180,00">Troca de Tela Notebook - R$ 180,00</option>
+                        <option value="Instalação de Placa de Vídeo - R$ 60,00">Instalação de Placa de Vídeo - R$ 60,00</option>
+                        <option value="Configuração de E-mail Corporativo - R$ 80,00">Configuração de E-mail Corporativo - R$ 80,00</option>
+                        <option value="Monitoramento de Rede - R$ 190,00">Monitoramento de Rede - R$ 190,00</option>
+                        <option value="Contrato de Manutenção Mensal - R$ 350,00">Contrato de Manutenção Mensal - R$ 350,00</option>
+                        <option value="Remoção de Programas Indesejados - R$ 70,00">Remoção de Programas Indesejados - R$ 70,00</option>
+                        <option value="Otimização de Desempenho - R$ 95,00">Otimização de Desempenho - R$ 95,00</option>
                         <option value="Outro">Outro (Personalizado)</option>
                     </select>
                 </div>
@@ -79,7 +95,7 @@
                 </div>
             </div>
         </div>
-        <button type="button" id="adicionarServico" class="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600 transition mt-2">+ Adicionar Novo Serviço</button>
+        <button type="button" id="adicionarServico" class="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600 transition mt-2">+ Adicionar Novo Serviço / Combo</button>
     </div>
 
     <div class="bg-white rounded-lg shadow p-6 mb-6">
@@ -130,20 +146,14 @@
         <div class="text-2xl font-bold text-green-700 mt-2">Valor Final: R$ <span id="valorTotal">0,00</span></div>
     </div>
 
-    <button id="gerarOrcamento" class="w-full bg-indigo-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition mb-8">📄 Gerar Orçamento em PDF</button>
+    <!-- ✅ DOIS BOTÕES: ORÇAMENTO E FATURA -->
+    <div class="grid md:grid-cols-2 gap-4 mb-8">
+        <button id="gerarOrcamento" class="bg-indigo-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition">📄 Gerar Orçamento</button>
+        <button id="gerarFaturaAprovada" class="bg-green-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition">✅ Gerar Orçamento Aprovado + Fatura</button>
+    </div>
 
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-lg font-semibold mb-4 text-gray-700">📚 Histórico de Orçamentos</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0;">
             <button id="exportarHistorico" style="background: #2ecc71; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">💾 Salvar Arquivo</button>
             <button id="importarHistorico" style="background: #9b59b6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">📂 Carregar Arquivo</button>
-            <input type="file" id="inputImportar" accept=".json" style="display: none;">
-        </div>
-        <ul id="listaHistorico" class="space-y-3"></ul>
-        <p id="vazioHistorico" class="text-muted text-center py-3 text-gray-500">Nenhum orçamento salvo ainda.</p>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
-
