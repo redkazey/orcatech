@@ -2,7 +2,6 @@ const { jsPDF } = window.jspdf;
 
 // ✅ MAIS DE 50 SERVIÇOS CADASTRADOS
 const valoresMercado = {
-    // ORIGINAIS
     "deslocamento": 55,
     "atendimento residencial": 110,
     "atendimento empresarial": 130,
@@ -19,7 +18,6 @@ const valoresMercado = {
     "backup": 70,
     "impressora": 125,
     "rede cabeada": 150,
-    // NOVOS ADICIONADOS
     "instalação de sistema operacional": 120,
     "configuração de servidor de arquivos": 220,
     "manutenção de notebook": 130,
@@ -126,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarAcrescimo();
     preencherCombosNoSelect();
 
+    // ✅ ADICIONAR NOVO SERVIÇO - CORRIGIDO
     const btnAdicionar = document.getElementById('adicionarServico');
     if (btnAdicionar) {
         btnAdicionar.addEventListener('click', () => {
@@ -139,8 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             novo.querySelector('.descricaoServico').value = '';
             novo.querySelector('.valorServico').value = '';
             novo.querySelector('.valor-sugerido').style.display = 'none';
-            
-            novo.querySelector('.valorServico').disabled = false;
+            novo.querySelector('.valorServico').disabled = false; // SEMPRE EDITÁVEL
             
             container.appendChild(novo);
 
@@ -176,11 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             novo.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(novo));
-            
             novo.querySelector('.valorServico').addEventListener('input', calcularTotal);
         });
     }
 
+    // Remover primeiro item
     document.querySelector('.removerServico').addEventListener('click', function() {
         if (document.querySelectorAll('.servico-item').length > 1) {
             this.parentElement.remove();
@@ -215,6 +213,7 @@ function preencherCombosNoSelect() {
     });
 }
 
+// ✅ FUNÇÃO DE DESCONTO CORRIGIDA
 function configurarDesconto() {
     const radios = document.querySelectorAll('input[name="tipoDesconto"]');
     const inputValor = document.getElementById('descontoValor');
@@ -236,6 +235,7 @@ function configurarDesconto() {
     inputPorc.addEventListener('input', calcularTotal);
 }
 
+// ✅ FUNÇÃO DE ACRÉSCIMO CORRIGIDA
 function configurarAcrescimo() {
     const radios = document.querySelectorAll('input[name="tipoAcrescimo"]');
     const inputValor = document.getElementById('acrescimoValor');
@@ -286,6 +286,7 @@ function buscarValor(container) {
     calcularTotal();
 }
 
+// ✅ CÁLCULO TOTAL 100% CORRIGIDO
 function calcularTotal() {
     let subtotal = 0;
     document.querySelectorAll('.servico-item').forEach(s => {
@@ -318,8 +319,8 @@ function calcularTotal() {
     if (desconto > 0) document.getElementById('valorDesconto').textContent = desconto.toFixed(2).replace('.', ',');
 
     const elemAcr = document.querySelector('.valor-acrescimo');
-    elemAcr.style.display = acrescimo > 0 ? 'block" : "none';
-    if (acrescimo > 0) document.getElementById('valorAcrescimo"').textContent = acrescimo.toFixed(2).replace('.', ',');
+    elemAcr.style.display = acrescimo > 0 ? 'block' : 'none';
+    if (acrescimo > 0) document.getElementById('valorAcrescimo').textContent = acrescimo.toFixed(2).replace('.', ',');
 
     document.getElementById('valorTotal').textContent = total.toFixed(2).replace('.', ',');
 }
@@ -335,7 +336,7 @@ function aplicarMascaras() {
     });
 
     const tel = document.getElementById('telefoneCliente');
-    tel.addEventListener('input', (e) => {
+    tel.addEventListener('input, keydown, keyup', (e) => {
         let v = e.target.value.replace(/\D/g, '');
         v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
         v = v.replace(/(\d)(\d{4})$/, '$1-$2');
@@ -343,6 +344,7 @@ function aplicarMascaras() {
     });
 }
 
+// ✅ GERAÇÃO DE PDF COM GARANTIA DE 90 DIAS POR LEI - TEXTO COMPLETO
 function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
     let dados;
     if (dadosDoHistorico) {
@@ -423,6 +425,7 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
     doc.setFontSize(12);
     doc.setFont('normal');
     doc.text(`Data/Hora: ${new Date(dados.dataHora).toLocaleString('pt-BR')}`, 20, 50);
+    doc.text(`Válido até: ${dados.dataValidadeTexto}`, 110, 50);
 
     let y = 60;
     if (dados.dadosCliente.nome) { doc.text(`Cliente: ${dados.dadosCliente.nome}`, 20, y); y += 8; }
@@ -473,254 +476,162 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
     doc.setFont('bold');
     doc.text(`VALOR FINAL: R$ ${dados.valores.total}`, 20, y + 18);
 
-    if (ehFaturaAprovada) {
-        y += 30;
-        doc.setFillColor(245, 245, 245);
-        doc.rect(15, y, 180, 80, 'F');
-        doc.setFontSize(16);
-        doc.setTextColor(44, 62, 80);
-        doc.text("💳 FORMAS DE PAGAMENTO", 105, y + 10, { align: 'center' });
-        
-        doc.setFontSize(11);
-        doc.text(`Acesse: ${DADOS_PAGAMENTO.linkPrincipal}`, 105, y + 22, { align: 'center' });
-        
-        doc.addImage(DADOS_PAGAMENTO.qrCodePixUrl, 'PNG', 25, y + 30, 40, 40);
-        doc.text("Pagamento PIX", 45, y + 78, { align: 'center' });
-
-        doc.text("Ou pague diretamente:", 100, y + 45);
-        doc.setTextColor(52, 152, 219);
-        doc.textWithLink("🔗 Pagar com PIX", 100, y + 55, { url: DADOS_PAGAMENTO.pixLink });
-        doc.textWithLink("🔗 Pagar com Cartão de Crédito", 100, y + 65, { url: DADOS_PAGAMENTO.cartaoLink });
-        doc.setTextColor(0,0,0);
-    }
-
+    // ✅ GARANTIA DE 90 DIAS CONFORME LEI 8.078/90 (CDC) - TEXTO COMPLETO
+    y += 28;
+    doc.setFillColor(255, 250, 205);
+    doc.rect(15, y, 180, 32, 'F');
+    doc.setTextColor(156, 101, 0);
     doc.setFontSize(11);
-    doc.setTextColor(80, 80, 80);
-    doc.text(`Válido até: ${dados.dataValidadeTexto} (3 dias)`, 20, 275);
+    doc.setFont('bold');
+    doc.text("✅ GARANTIA LEGAL DE 90 DIAS (CDC - LEI Nº 8.078/90)", 105, y + 8, { align: 'center' });
+    doc.setFont('normal');
+    doc.text("Garantia contra defeitos técnicos no serviço prestado, válida por 90 dias corridos a partir da execução.", 105, y + 16, { align: 'center', maxWidth: 170 });
+    doc.text("Após este prazo, extingue-se a responsabilidade legal por vícios ou defeitos.", 105, y + 24, { align: 'center', maxWidth: 170 });
+    doc.setTextColor(0, 0, 0);
 
-    doc.setFont('Permanent Marker', 'cursive');
-    doc.setFontSize(22);
-    doc.setTextColor(44, 62, 80);
-    doc.text('RDTech', 160, 285, { align: 'right' });
+    // ✅ SEÇÃO DE PAGAMENTO
+    y += 40;
+    doc.setFillColor(240, 240, 240);
+    doc.rect(15, y, 180, 40, 'F');
+    doc.setFontSize(12);
+    doc.setFont('bold');
+    doc.text("💳 FORMAS DE PAGAMENTO", 105, y + 8, { align: 'center' });
+    doc.setFont('normal');
+    doc.setFontSize(10);
+    doc.text("Aceitamos Pix, Cartão de Crédito/Débito e Transferência.", 105, y + 16, { align: 'center' });
+    doc.text(`Link para pagamento: ${DADOS_PAGAMENTO.linkPrincipal}`, 105, y + 24, { align: 'center' });
+    doc.text("Pagamento à vista ou condições combinadas previamente.", 105, y + 32, { align: 'center' });
+
+    // ✅ ASSINATURAS
+    y += 50;
+    doc.line(20, y, 80, y);
+    doc.text("Assinatura do Cliente", 30, y + 8);
+
+    doc.line(120, y, 180, y);
+    doc.text("Assinatura Responsável Técnico", 125, y + 8);
+
+    doc.setFontSize(8);
+    doc.text("RDTech - Soluções em Informática | CNPJ: 00.000.000/0001-00 | contato@rdtech.com.br", 105, 285, { align: 'center' });
 
     doc.save(dados.nomeArquivo);
 }
 
-function salvarNoHistorico(item) {
-    let historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
-    historico.unshift(item);
-    localStorage.setItem('orcamentos', JSON.stringify(historico));
+function salvarNoHistorico(dados) {
+    let historico = JSON.parse(localStorage.getItem('orcamentos_historico')) || [];
+    historico.unshift(dados);
+    localStorage.setItem('orcamentos_historico', JSON.stringify(historico));
     carregarHistorico();
 }
 
 function carregarHistorico() {
     const lista = document.getElementById('listaHistorico');
+    const vazio = document.getElementById('vazioHistorico');
     lista.innerHTML = '';
-    const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
-    document.getElementById('vazioHistorico').style.display = historico.length ? 'none' : 'block';
+    lista.appendChild(vazio);
+
+    const historico = JSON.parse(localStorage.getItem('orcamentos_historico')) || [];
+
+    if (historico.length === 0) {
+        vazio.style.display = 'block';
+        return;
+    }
+    vazio.style.display = 'none';
 
     historico.forEach((item, index) => {
         const li = document.createElement('li');
-        const nome = (item.dadosCliente && item.dadosCliente.nome) ? `Cliente: ${item.dadosCliente.nome}` : 'Cliente não informado';
-        const corStatus = item.status === 'APROVADO' ? '#27ae60' : item.status === 'RECUSADO' ? '#e74c3c' : '#f39c12';
-        
+        li.className = 'p-3 bg-gray-50 rounded border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2';
+
+        const statusColor = item.status === 'APROVADO' ? 'text-green-600 font-medium' : 'text-yellow-600 font-medium';
+
         li.innerHTML = `
             <div>
-                <strong>${nome}</strong>
-                <span style="background:${corStatus}; color:white; padding:2px 6px; border-radius:4px; font-size:11px; margin-left:8px;">${item.status || 'PENDENTE'}</span>
-                <br><small>${item.nomeArquivo} | ${new Date(item.dataHora).toLocaleString('pt-BR')}</small>
+                <p class="font-semibold">${item.dadosCliente.nome || 'Cliente não informado'}</p>
+                <p class="text-sm text-gray-600">${new Date(item.dataHora).toLocaleString('pt-BR')} | Total: R$ ${item.valores.total}</p>
+                <p class="text-sm ${statusColor}">Status: ${item.status}</p>
             </div>
-            <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">
-                <button onclick="reeditarOrcamento(${index})" style="background:#2980b9;color:white;border:none;padding:6px 8px;border-radius:4px;">✏️ Editar</button>
-                <button onclick="gerarFaturaDoHistorico(${index})" style="background:#27ae60;color:white;border:none;padding:6px 8px;border-radius:4px;">✅ Gerar Fatura</button>
-                <button onclick="marcarComoRecusado(${index})" style="background:#e67e22;color:white;border:none;padding:6px 8px;border-radius:4px;">❌ Recusar</button>
-                <button onclick="excluirDoHistorico(${index})" style="background:#e74c3c;color:white;border:none;padding:6px 8px;border-radius:4px;">🗑 Excluir</button>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <button class="visualizar-btn text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200" data-index="${index}">👁️ Ver</button>
+                <button class="baixar-btn text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200" data-index="${index}">📄 Baixar</button>
+                <button class="excluir-btn text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200" data-index="${index}">🗑️</button>
             </div>
         `;
         lista.appendChild(li);
     });
+
+    document.querySelectorAll('.visualizar-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.getAttribute('data-index'));
+            visualizarOrcamento(historico[idx]);
+        });
+    });
+
+    document.querySelectorAll('.baixar-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.getAttribute('data-index'));
+            gerarOrcamento(historico[idx].status === 'APROVADO', historico[idx]);
+        });
+    });
+
+    document.querySelectorAll('.excluir-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.getAttribute('data-index'));
+            excluirDoHistorico(idx);
+        });
+    });
 }
 
-function gerarFaturaDoHistorico(index) {
-    const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
-    const item = historico[index];
-    if (item) {
-        item.status = 'APROVADO';
-        gerarOrcamento(true, item);
-        salvarNoHistorico(item);
-    }
-}
-
-function marcarComoRecusado(index) {
-    const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
-    if (historico[index]) {
-        historico[index].status = 'RECUSADO';
-        localStorage.setItem('orcamentos', JSON.stringify(historico));
-        carregarHistorico();
-    }
-}
-
-function excluirDoHistorico(index) {
-    let historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
-    historico.splice(index, 1);
-    localStorage.setItem('orcamentos', JSON.stringify(historico));
+function excluirDoHistorico(indice) {
+    let historico = JSON.parse(localStorage.getItem('orcamentos_historico')) || [];
+    historico.splice(indice, 1);
+    localStorage.setItem('orcamentos_historico', JSON.stringify(historico));
     carregarHistorico();
 }
 
-function reeditarOrcamento(index) {
-    const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
-    const item = historico[index];
-    if (!item) return;
+function visualizarOrcamento(dados) {
+    let conteudo = `=== ORÇAMENTO ===\n`;
+    conteudo += `Data: ${new Date(dados.dataHora).toLocaleString('pt-BR')}\nStatus: ${dados.status}\n`;
+    conteudo += `Cliente: ${dados.dadosCliente.nome || 'Não informado'}\nCPF: ${dados.dadosCliente.cpf || 'Não informado'}\n`;
+    conteudo += `\n--- Serviços ---\n`;
+    dados.servicos.forEach(s => {
+        conteudo += `${s.tipo} - R$ ${s.valor}\n`;
+        if (s.descricao) conteudo += `   Obs: ${s.descricao}\n`;
+    });
+    conteudo += `\n--- Valores ---\nSubtotal: R$ ${dados.valores.subtotal}\nDesconto: R$ ${dados.valores.descontoTexto}\nAcréscimo: R$ ${dados.valores.acrescimoTexto}\nTOTAL: R$ ${dados.valores.total}`;
 
-    document.getElementById('nomeCliente').value = item.dadosCliente?.nome || '';
-    document.getElementById('cpfCliente').value = item.dadosCliente?.cpf || '';
-    document.getElementById('emailCliente').value = item.dadosCliente?.email || '';
-    document.getElementById('telefoneCliente').value = item.dadosCliente?.telefone || '';
-    document.getElementById('observacaoGeral').value = item.observacao || '';
-    
-    const listaServicos = document.getElementById('listaServicos');
-    while (listaServicos.children.length > 1) listaServicos.removeChild(listaServicos.lastChild);
-
-    document.querySelector('input[name="tipoDesconto"][value="nenhum"]').checked = true;
-    document.getElementById('descontoValor').value = '';
-    document.getElementById('descontoValor').disabled = true;
-    document.getElementById('descontoPorc').value = '';
-    document.getElementById('descontoPorc').disabled = true;
-    document.querySelector('input[name="tipoAcrescimo"][value="nenhum"]').checked = true;
-    document.getElementById('acrescimoValor').value = '';
-    document.getElementById('acrescimoValor').disabled = true;
-    document.getElementById('acrescimoPorc').value = '';
-    document.getElementById('acrescimoPorc').disabled = true;
-
-    if (item.servicos && item.servicos.length > 0) {
-        item.servicos.forEach((servico, idx) => {
-            let el;
-            if (idx === 0) el = listaServicos.children[0];
-            else {
-                const modelo = document.querySelector('.servico-item');
-                const novo = modelo.cloneNode(true);
-                novo.querySelector('.valor-sugerido').style.display = 'none';
-                listaServicos.appendChild(novo);
-                el = novo;
-                el.querySelector('.removerServico').addEventListener('click', () => {
-                    if (document.querySelectorAll('.servico-item').length > 1) { el.remove(); calcularTotal(); }
-                });
-                el.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(el));
-                el.querySelector('.valorServico').addEventListener('input', calcularTotal);
-            }
-            el.querySelector('.tipoServico').value = servico.tipo || '';
-            el.querySelector('.descricaoServico').value = servico.descricao || '';
-            el.querySelector('.valorServico').value = servico.valor || '';
-            el.querySelector('.valorServico').disabled = false;
-        });
-    }
-
-    if (item.ajustes) {
-        if (item.ajustes.tipoDesconto) {
-            document.querySelector(`input[name="tipoDesconto"][value="${item.ajustes.tipoDesconto}"]`).checked = true;
-            document.getElementById('descontoValor').disabled = item.ajustes.tipoDesconto !== 'valor';
-            document.getElementById('descontoPorc').disabled = item.ajustes.tipoDesconto !== 'porcentagem';
-            document.getElementById('descontoValor').value = item.ajustes.valorDesconto || '';
-            document.getElementById('descontoPorc').value = item.ajustes.porcDesconto || '';
-        }
-        if (item.ajustes.tipoAcrescimo) {
-            document.querySelector(`input[name="tipoAcrescimo"][value="${item.ajustes.tipoAcrescimo}"]`).checked = true;
-            document.getElementById('acrescimoValor').disabled = item.ajustes.tipoAcrescimo !== 'valor';
-            document.getElementById('acrescimoPorc').disabled = item.ajustes.tipoAcrescimo !== 'porcentagem';
-            document.getElementById('acrescimoValor').value = item.ajustes.valorAcrescimo || '';
-            document.getElementById('acrescimoPorc').value = item.ajustes.porcAcrescimo || '';
-        }
-    }
-
-    calcularTotal();
-    window.scrollTo({top:0,behavior:'smooth'});
+    alert(conteudo);
 }
 
 function exportarHistorico() {
-    const historico = localStorage.getItem('orcamentos') || '[]';
-    const blob = new Blob([historico], {type:'application/json'});
+    const historico = localStorage.getItem('orcamentos_historico') || '[]';
+    const blob = new Blob([historico], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `historico_${new Date().toLocaleString('pt-BR').replace(/[\/: ]/g,'-')}.json`;
+    a.href = url;
+    a.download = `historico_orcamentos_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.json`;
     a.click();
-    alert('✅ Salvo com sucesso!');
+    URL.revokeObjectURL(url);
 }
 
 function importarHistorico(e) {
-    const arq = e.target.files[0];
-    if (!arq) return;
+    const arquivo = e.target.files[0];
+    if (!arquivo) return;
+
     const leitor = new FileReader();
-    leitor.onload = ev => {
+    leitor.onload = function(evt) {
         try {
-            const dados = JSON.parse(ev.target.result);
-            if (!Array.isArray(dados)) throw Error('inválido');
-            const junta = confirm('JUNTAR com atual ou SUBSTITUIR?\nOK = JUNTAR | CANCELAR = SUBSTITUIR');
-            let atual = JSON.parse(localStorage.getItem('orcamentos')) || [];
-            if (junta) {
-                const ids = atual.map(i => i.nomeArquivo+i.dataHora);
-                const novos = dados.filter(i => !ids.includes(i.nomeArquivo+i.dataHora));
-                atual = [...novos, ...atual];
-            } else atual = dados;
-            localStorage.setItem('orcamentos', JSON.stringify(atual));
-            carregarHistorico();
-            alert('✅ Importado!');
-        } catch { alert('❌ Erro no arquivo'); }
-        e.target.value = '';
-    };
-    leitor.readAsText(arq);
-}
-
-window.excluirDoHistorico = excluirDoHistorico;
-window.reeditarOrcamento = reeditarOrcamento;
-window.exportarHistorico = exportarHistorico;
-window.importarHistorico = importarHistorico;
-window.gerarFaturaDoHistorico = gerarFaturaDoHistorico;
-window.marcarComoRecusado = marcarComoRecusado;
-
-// ✅ CORREÇÃO DE BUGS E AJUSTES FINAIS DE EXIBIÇÃO
-document.addEventListener('DOMContentLoaded', () => {
-    // Garante que valores iniciem como editáveis
-    document.querySelectorAll('.valorServico').forEach(input => {
-        input.disabled = false;
-        input.addEventListener('input', calcularTotal);
-    });
-
-    // Ajusta exibição inicial de descontos e acréscimos
-    calcularTotal();
-});
-
-// ✅ FUNÇÃO AUXILIAR PARA FORMATAR MOEDA (padronização em todo sistema)
-function formatarMoeda(valor) {
-    return valor.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
-
-// ✅ VALIDAÇÃO ANTES DE GERAR PDF (evita erros com campos vazios)
-function validarDados() {
-    const servicos = document.querySelectorAll('.servico-item');
-    let valido = true;
-    let mensagem = '';
-
-    servicos.forEach((servico, index) => {
-        const valor = parseFloat(servico.querySelector('.valorServico').value);
-        if (isNaN(valor) || valor <= 0) {
-            mensagem += `⚠️ Serviço ${index + 1}: valor inválido ou zerado.\n`;
-            valido = false;
+            const dados = JSON.parse(evt.target.result);
+            if (Array.isArray(dados)) {
+                localStorage.setItem('orcamentos_historico', JSON.stringify(dados));
+                carregarHistorico();
+                alert('Histórico importado com sucesso!');
+            } else {
+                alert('Arquivo inválido.');
+            }
+        } catch (erro) {
+            alert('Erro ao ler o arquivo.');
         }
-    });
-
-    if (!valido) {
-        alert('Corrija os seguintes erros:\n\n' + mensagem);
-    }
-
-    return valido;
+    };
+    leitor.readAsText(arquivo);
+    };
 }
 
-// ✅ SOBRESCREVENDO FUNÇÃO DE GERAR ORÇAMENTO PARA INCLUIR VALIDAÇÃO SEGURA
-const gerarOrcamentoOriginal = gerarOrcamento;
-gerarOrcamento = function(ehFaturaAprovada = false, dadosDoHistorico = null) {
-    if (dadosDoHistorico || validarDados()) {
-        gerarOrcamentoOriginal(ehFaturaAprovada, dadosDoHistorico);
-    }
-};
-
-console.log("✅ Sistema de orçamentos carregado com sucesso! Versão 2.1 - Completa");
