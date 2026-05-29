@@ -6,6 +6,8 @@
     <title>Orçamento de Serviços de Informática</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Fonte estilo pichação para a assinatura -->
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -69,8 +71,47 @@
             </div>
             <button type="button" id="adicionarServico" class="btn-adicionar">+ Adicionar Novo Serviço</button>
 
+            <!-- 💸 DESCONTO -->
+            <div class="desconto-box">
+                <h3>💸 Aplicar Desconto</h3>
+                <div class="desconto-opcoes">
+                    <label>
+                        <input type="radio" name="tipoDesconto" value="nenhum" checked> Nenhum
+                    </label>
+                    <label>
+                        <input type="radio" name="tipoDesconto" value="valor"> Valor R$
+                        <input type="number" id="descontoValor" placeholder="0,00" min="0" step="0.01" disabled>
+                    </label>
+                    <label>
+                        <input type="radio" name="tipoDesconto" value="porcentagem"> Porcentagem %
+                        <input type="number" id="descontoPorc" placeholder="0" min="0" max="100" disabled>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ➕ ACRÉSCIMO / TAXA EXTRA -->
+            <div class="acrescimo-box">
+                <h3>➕ Acréscimo / Taxa Extra</h3>
+                <div class="acrescimo-opcoes">
+                    <label>
+                        <input type="radio" name="tipoAcrescimo" value="nenhum" checked> Nenhum
+                    </label>
+                    <label>
+                        <input type="radio" name="tipoAcrescimo" value="valor"> Valor R$
+                        <input type="number" id="acrescimoValor" placeholder="0,00" min="0" step="0.01" disabled>
+                    </label>
+                    <label>
+                        <input type="radio" name="tipoAcrescimo" value="porcentagem"> Porcentagem %
+                        <input type="number" id="acrescimoPorc" placeholder="0" min="0" max="100" disabled>
+                    </label>
+                </div>
+            </div>
+
             <div class="total-box">
-                <h3>Valor Total a Pagar: R$ <span id="valorTotal">0,00</span></h3>
+                <p class="subtotal">Subtotal: R$ <span id="subtotal">0,00</span></p>
+                <p class="valor-desconto" style="display: none;">Desconto: - R$ <span id="valorDesconto">0,00</span></p>
+                <p class="valor-acrescimo" style="display: none;">Acréscimo: + R$ <span id="valorAcrescimo">0,00</span></p>
+                <h3>Valor Final: R$ <span id="valorTotal">0,00</span></h3>
             </div>
 
             <button type="button" id="gerarOrcamento" class="btn-gerar">📄 Gerar Orçamento em PDF</button>
