@@ -26,32 +26,39 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarDesconto();
     configurarAcrescimo();
 
-    document.getElementById('adicionarServico').addEventListener('click', () => {
-        const container = document.getElementById('listaServicos');
-        const modelo = document.querySelector('.servico-item');
-        const novo = modelo.cloneNode(true);
-        
-        novo.querySelector('.tipoServico').value = '';
-        novo.querySelector('.descricaoServico').value = '';
-        novo.querySelector('.valorServico').value = '';
-        novo.querySelector('.valor-sugerido').style.display = 'none';
-        
-        container.appendChild(novo);
+    // ✅ CORREÇÃO AQUI: pegando o botão pelo ID e evento único
+    const btnAdicionar = document.getElementById('adicionarServico');
+    if (btnAdicionar) {
+        btnAdicionar.addEventListener('click', () => {
+            const container = document.getElementById('listaServicos');
+            const modelo = document.querySelector('.servico-item');
+            if (!modelo) return;
 
-        novo.querySelector('.removerServico').addEventListener('click', () => {
-            if (document.querySelectorAll('.servico-item').length > 1) {
-                novo.remove();
+            const novo = modelo.cloneNode(true);
+            
+            novo.querySelector('.tipoServico').value = '';
+            novo.querySelector('.descricaoServico').value = '';
+            novo.querySelector('.valorServico').value = '';
+            novo.querySelector('.valor-sugerido').style.display = 'none';
+            
+            container.appendChild(novo);
+
+            novo.querySelector('.removerServico').addEventListener('click', () => {
+                if (document.querySelectorAll('.servico-item').length > 1) {
+                    novo.remove();
+                    calcularTotal();
+                }
+            });
+
+            novo.querySelector('.tipoServico').addEventListener('change', function() {
                 calcularTotal();
-            }
+            });
+
+            novo.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(novo));
         });
+    }
 
-        novo.querySelector('.tipoServico').addEventListener('change', function() {
-            calcularTotal();
-        });
-
-        novo.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(novo));
-    });
-
+    // Remover do primeiro item
     document.querySelector('.removerServico').addEventListener('click', function() {
         if (document.querySelectorAll('.servico-item').length > 1) {
             this.parentElement.remove();
@@ -388,7 +395,7 @@ function reeditarOrcamento(index) {
                 });
                 el.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(el));
             }
-            el.querySelector('.tipoServico").value = servico.tipo || '';
+            el.querySelector('.tipoServico').value = servico.tipo || '';
             el.querySelector('.descricaoServico').value = servico.descricao || '';
             el.querySelector('.valorServico').value = servico.valor || '';
         });
@@ -453,3 +460,4 @@ window.excluirDoHistorico = excluirDoHistorico;
 window.reeditarOrcamento = reeditarOrcamento;
 window.exportarHistorico = exportarHistorico;
 window.importarHistorico = importarHistorico;
+
