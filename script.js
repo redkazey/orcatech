@@ -1,6 +1,6 @@
 const { jsPDF } = window.jspdf;
 
-// ✅ MUITOS MAIS SERVIÇOS ADICIONADOS
+// ✅ MAIS DE 50 SERVIÇOS CADASTRADOS
 const valoresMercado = {
     // ORIGINAIS
     "deslocamento": 55,
@@ -60,7 +60,14 @@ const valoresMercado = {
     "atualização de bios": 80,
     "configuração de acessos remotos": 90,
     "instalação de cabo de rede": 35,
-    "teste de cabeamento": 50
+    "teste de cabeamento": 50,
+    "configuração de proxy": 120,
+    "instalação de nobreak": 90,
+    "calibração de bateria": 40,
+    "recuperação de senha": 70,
+    "configuração de hd externo": 55,
+    "instalação de leitor de código de barras": 85,
+    "manutenção de estação de trabalho": 160
 };
 
 // ✅ COMBOS DE SERVIÇOS COM DESCONTO
@@ -68,37 +75,37 @@ const combosServicos = {
     "Combo Manutenção Completa (Limpeza + Troca Pasta + Otimização)": {
         servicos: ["limpeza interna", "troca de pasta térmica", "otimização de desempenho"],
         valorOriginal: 290,
-        valorCombo: 240, // Desconto de R$50
+        valorCombo: 240,
         desconto: 50
     },
     "Combo Segurança (Remoção Vírus + Backup + Antivírus)": {
         servicos: ["remover vírus", "backup", "instalação de antivírus"],
         valorOriginal: 245,
-        valorCombo: 195, // Desconto de R$50
+        valorCombo: 195,
         desconto: 50
     },
     "Combo Rede Completa (Wi-Fi + Cabeada + Configuração)": {
         servicos: ["rede wi-fi", "rede cabeada", "configuração de roteador"],
         valorOriginal: 400,
-        valorCombo: 330, // Desconto de R$70
+        valorCombo: 330,
         desconto: 70
     },
     "Combo Formatação Completa (Formatar + Instalar Programas + Drivers)": {
         servicos: ["formatação", "instalação de programa", "instalação de sistema operacional"],
         valorOriginal: 335,
-        valorCombo: 270, // Desconto de R$65
+        valorCombo: 270,
         desconto: 65
     },
     "Combo Upgrade PC (Memória + SSD + Instalação + Configuração)": {
         servicos: ["instalação de memória ram", "instalação de hd/ssd", "otimização de desempenho"],
         valorOriginal: 180,
-        valorCombo: 145, // Desconto de R$35
+        valorCombo: 145,
         desconto: 35
     },
     "Combo Suporte Empresarial (Atendimento + Rede + Servidor)": {
         servicos: ["atendimento empresarial", "rede cabeada", "servidor"],
         valorOriginal: 530,
-        valorCombo: 450, // Desconto de R$80
+        valorCombo: 450,
         desconto: 80
     }
 };
@@ -133,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
             novo.querySelector('.valorServico').value = '';
             novo.querySelector('.valor-sugerido').style.display = 'none';
             
-            // ✅ LIBERAR EDIÇÃO DO VALOR SEMPRE
             novo.querySelector('.valorServico').disabled = false;
             
             container.appendChild(novo);
@@ -149,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const valorSelecionado = this.value;
                 const inputValor = novo.querySelector('.valorServico');
                 
-                // Se for um combo, preenche valor mas DEIXA EDITÁVEL
                 if (combosServicos[valorSelecionado]) {
                     const combo = combosServicos[valorSelecionado];
                     novo.querySelector('.descricaoServico').value = `${valorSelecionado} | Economia de R$ ${combo.desconto.toFixed(2).replace('.', ',')}`;
@@ -157,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     novo.querySelector('.valor-sugerido').textContent = `Valor do Combo: R$ ${combo.valorCombo.toFixed(2).replace('.', ',')}`;
                     novo.querySelector('.valor-sugerido').style.display = 'inline-block';
                 }
-                // Se for serviço normal, preenche valor mas DEIXA EDITÁVEL
                 else if (valorSelecionado && valorSelecionado !== 'Outro') {
                     const valor = parseFloat(valorSelecionado.split('R$ ')[1].replace(',', '.'));
                     if (!isNaN(valor)) {
@@ -173,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             novo.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(novo));
             
-            // ✅ RECALCULAR QUANDO EDITAR VALOR MANUALMENTE
             novo.querySelector('.valorServico').addEventListener('input', calcularTotal);
         });
     }
@@ -186,11 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(document.querySelector('.servico-item')));
-    
-    // ✅ RECALCULAR QUANDO EDITAR VALOR DO PRIMEIRO ITEM
     document.querySelector('.valorServico').addEventListener('input', calcularTotal);
 
-    // ✅ NOVOS BOTÕES
     document.getElementById('gerarOrcamento').addEventListener('click', gerarOrcamento);
     document.getElementById('gerarFaturaAprovada').addEventListener('click', () => gerarOrcamento(true));
 
@@ -199,16 +199,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('inputImportar').addEventListener('change', importarHistorico);
 });
 
-// Adiciona os combos na lista de seleção
 function preencherCombosNoSelect() {
     const selects = document.querySelectorAll('.tipoServico');
     selects.forEach(select => {
-        // Adiciona um separador
         const separador = document.createElement('optgroup');
         separador.label = '--- 🎁 COMBOS COM DESCONTO ---';
         select.appendChild(separador);
 
-        // Adiciona cada combo
         Object.keys(combosServicos).forEach(nomeCombo => {
             const opt = document.createElement('option');
             opt.value = nomeCombo;
@@ -272,11 +269,9 @@ function buscarValor(container) {
     }
 
     let valorEncontrado = null;
-    let nomeServicoEncontrado = '';
     for (const [chave, valor] of Object.entries(valoresMercado)) {
         if (descricao.includes(chave)) {
             valorEncontrado = valor;
-            nomeServicoEncontrado = chave;
             break;
         }
     }
@@ -286,7 +281,6 @@ function buscarValor(container) {
     elementoValor.textContent = valorEncontrado.toFixed(2).replace('.', ',');
     elementoDisplay.style.display = 'inline-block';
     inputValor.value = valorEncontrado.toFixed(2);
-    // ✅ CAMPO SEMPRE EDITÁVEL
     inputValor.disabled = false;
     
     calcularTotal();
@@ -295,7 +289,6 @@ function buscarValor(container) {
 function calcularTotal() {
     let subtotal = 0;
     document.querySelectorAll('.servico-item').forEach(s => {
-        // ✅ PEGA SEMPRE O VALOR DIGITADO PELO USUÁRIO (mesmo que seja de combo/serviço)
         const val = parseFloat(s.querySelector('.valorServico').value.replace(',', '.'));
         if (!isNaN(val)) subtotal += val;
     });
@@ -325,8 +318,8 @@ function calcularTotal() {
     if (desconto > 0) document.getElementById('valorDesconto').textContent = desconto.toFixed(2).replace('.', ',');
 
     const elemAcr = document.querySelector('.valor-acrescimo');
-    elemAcr.style.display = acrescimo > 0 ? 'block' : 'none';
-    if (acrescimo > 0) document.getElementById('valorAcrescimo').textContent = acrescimo.toFixed(2).replace('.', ',');
+    elemAcr.style.display = acrescimo > 0 ? 'block" : "none';
+    if (acrescimo > 0) document.getElementById('valorAcrescimo"').textContent = acrescimo.toFixed(2).replace('.', ',');
 
     document.getElementById('valorTotal').textContent = total.toFixed(2).replace('.', ',');
 }
@@ -350,14 +343,11 @@ function aplicarMascaras() {
     });
 }
 
-// ✅ FUNÇÃO DE GERAR ORÇAMENTO/FATURA ATUALIZADA
 function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
-    // Se vier do histórico, usa os dados salvos
     let dados;
     if (dadosDoHistorico) {
         dados = dadosDoHistorico;
     } else {
-        // Se for novo preenchimento
         const nome = document.getElementById('nomeCliente').value.trim();
         const cpf = document.getElementById('cpfCliente').value.trim();
         const email = document.getElementById('emailCliente').value.trim();
@@ -412,12 +402,10 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
         salvarNoHistorico(dados);
     }
 
-    // === GERAÇÃO DO PDF ===
     const doc = new jsPDF();
     const titulo = ehFaturaAprovada ? "FATURA DE SERVIÇOS - APROVADA" : "ORÇAMENTO DE SERVIÇOS DE INFORMÁTICA";
     const corStatus = dados.status === 'APROVADO' ? [39, 174, 96] : [241, 196, 15];
 
-    // Cabeçalho
     doc.setFillColor(44, 62, 80);
     doc.rect(0, 0, 210, 40, 'F');
     doc.setTextColor(255, 255, 255);
@@ -425,7 +413,6 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
     doc.setFont('bold');
     doc.text(titulo, 105, 25, { align: 'center' });
     
-    // Status
     doc.setFillColor(...corStatus);
     doc.roundedRect(140, 42, 50, 12, 3, 3, 'F');
     doc.setTextColor(255, 255, 255);
@@ -443,7 +430,6 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
     if (dados.dadosCliente.email) { doc.text(`E-mail: ${dados.dadosCliente.email}`, 20, y); y += 8; }
     if (dados.dadosCliente.telefone) { doc.text(`Telefone: ${dados.dadosCliente.telefone}`, 20, y); y += 12; }
 
-    // Observação
     if (dados.observacao) {
         doc.setFont('bold');
         doc.text("📝 Observações:", 20, y);
@@ -487,7 +473,6 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
     doc.setFont('bold');
     doc.text(`VALOR FINAL: R$ ${dados.valores.total}`, 20, y + 18);
 
-    // ✅ SE FOR FATURA APROVADA: ADICIONA DADOS DE PAGAMENTO
     if (ehFaturaAprovada) {
         y += 30;
         doc.setFillColor(245, 245, 245);
@@ -496,16 +481,14 @@ function gerarOrcamento(ehFaturaAprovada = false, dadosDoHistorico = null) {
         doc.setTextColor(44, 62, 80);
         doc.text("💳 FORMAS DE PAGAMENTO", 105, y + 10, { align: 'center' });
         
-        // Link Principal
         doc.setFontSize(11);
         doc.text(`Acesse: ${DADOS_PAGAMENTO.linkPrincipal}`, 105, y + 22, { align: 'center' });
         
-        // QR Code e Links
         doc.addImage(DADOS_PAGAMENTO.qrCodePixUrl, 'PNG', 25, y + 30, 40, 40);
         doc.text("Pagamento PIX", 45, y + 78, { align: 'center' });
 
         doc.text("Ou pague diretamente:", 100, y + 45);
-        doc.setTextColor(52,  152, 219);
+        doc.setTextColor(52, 152, 219);
         doc.textWithLink("🔗 Pagar com PIX", 100, y + 55, { url: DADOS_PAGAMENTO.pixLink });
         doc.textWithLink("🔗 Pagar com Cartão de Crédito", 100, y + 65, { url: DADOS_PAGAMENTO.cartaoLink });
         doc.setTextColor(0,0,0);
@@ -558,14 +541,13 @@ function carregarHistorico() {
     });
 }
 
-// ✅ FUNÇÕES NOVAS DO HISTÓRICO
 function gerarFaturaDoHistorico(index) {
     const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
     const item = historico[index];
     if (item) {
         item.status = 'APROVADO';
         gerarOrcamento(true, item);
-        salvarNoHistorico(item); // Atualiza status
+        salvarNoHistorico(item);
     }
 }
 
@@ -624,13 +606,12 @@ function reeditarOrcamento(index) {
                     if (document.querySelectorAll('.servico-item').length > 1) { el.remove(); calcularTotal(); }
                 });
                 el.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(el));
-                // ✅ LIBERAR EDIÇÃO AO RECARREGAR
                 el.querySelector('.valorServico').addEventListener('input', calcularTotal);
             }
             el.querySelector('.tipoServico').value = servico.tipo || '';
             el.querySelector('.descricaoServico').value = servico.descricao || '';
             el.querySelector('.valorServico').value = servico.valor || '';
-            el.querySelector('.valorServico').disabled = false; // SEMPRE EDITÁVEL
+            el.querySelector('.valorServico').disabled = false;
         });
     }
 
@@ -696,3 +677,50 @@ window.importarHistorico = importarHistorico;
 window.gerarFaturaDoHistorico = gerarFaturaDoHistorico;
 window.marcarComoRecusado = marcarComoRecusado;
 
+// ✅ CORREÇÃO DE BUGS E AJUSTES FINAIS DE EXIBIÇÃO
+document.addEventListener('DOMContentLoaded', () => {
+    // Garante que valores iniciem como editáveis
+    document.querySelectorAll('.valorServico').forEach(input => {
+        input.disabled = false;
+        input.addEventListener('input', calcularTotal);
+    });
+
+    // Ajusta exibição inicial de descontos e acréscimos
+    calcularTotal();
+});
+
+// ✅ FUNÇÃO AUXILIAR PARA FORMATAR MOEDA (padronização em todo sistema)
+function formatarMoeda(valor) {
+    return valor.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// ✅ VALIDAÇÃO ANTES DE GERAR PDF (evita erros com campos vazios)
+function validarDados() {
+    const servicos = document.querySelectorAll('.servico-item');
+    let valido = true;
+    let mensagem = '';
+
+    servicos.forEach((servico, index) => {
+        const valor = parseFloat(servico.querySelector('.valorServico').value);
+        if (isNaN(valor) || valor <= 0) {
+            mensagem += `⚠️ Serviço ${index + 1}: valor inválido ou zerado.\n`;
+            valido = false;
+        }
+    });
+
+    if (!valido) {
+        alert('Corrija os seguintes erros:\n\n' + mensagem);
+    }
+
+    return valido;
+}
+
+// ✅ SOBRESCREVENDO FUNÇÃO DE GERAR ORÇAMENTO PARA INCLUIR VALIDAÇÃO SEGURA
+const gerarOrcamentoOriginal = gerarOrcamento;
+gerarOrcamento = function(ehFaturaAprovada = false, dadosDoHistorico = null) {
+    if (dadosDoHistorico || validarDados()) {
+        gerarOrcamentoOriginal(ehFaturaAprovada, dadosDoHistorico);
+    }
+};
+
+console.log("✅ Sistema de orçamentos carregado com sucesso! Versão 2.1 - Completa");
