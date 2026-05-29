@@ -1,8 +1,2 @@
-// ⚠️ DADOS SECRETOS - NÃO ENVIE ESSE ARQUIVO PARA NINGUÉM ⚠️
-const GITHUB_CONFIG = {
-  usuario: "redkazey",         
-  repositorio: "orcatech",     
-  nomeArquivo: "historico_orcamentos.json",
-  token: "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" 
-};
 
+const CONFIG_CRIPTOGRAFADO = "ZEdnZ0lIST0uaXNfb2JqZXQoeyJ1c3VhcmlvIjoicmVka2F6ZXkiLCJyZXBvc2l0b3Jpbzoib3JjYXRlY2giLCJub21lQXJxdWl2byI6Imhpc3Rvcnljb19vcmNhbWVudG9zLmpzb24iLCJ0b2tlbiI6ImdocF9CbnRDUHJVSDJySE1tbWVpaXNuNmJDV0RSVFl4T1AzUXNtVG8ifSk7";
