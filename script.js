@@ -1,7 +1,33 @@
-// Carrega configuração secreta
-if (typeof GITHUB_CONFIG === 'undefined') {
-  alert('❌ Arquivo config.js não encontrado!');
+// 🔐 SENHA PARA DESCRIPTOGRAFAR (NÃO MUDE!)
+const SENHA = "231192";
+
+// ⚠️ FUNÇÃO DE SEGURANÇA: Decodifica o arquivo config.js
+function decodificarConfig(textoCodificado, senha) {
+  try {
+    // Decodifica Base64
+    let decodificado = atob(textoCodificado);
+    // Aplica a senha para "desembaralhar"
+    let resultado = "";
+    for (let i = 0; i < decodificado.length; i++) {
+      resultado += String.fromCharCode(decodificado.charCodeAt(i) ^ senha.charCodeAt(i % senha.length));
+    }
+    return eval(resultado); // Executa o texto decifrado como código
+  } catch (e) {
+    alert('❌ Erro: Arquivo de configuração corrompido ou senha errada!');
+    return null;
+  }
 }
+
+// Carrega e descriptografa os dados secretos
+const GITHUB_CONFIG = decodificarConfig(CONFIG_CRIPTOGRAFADO, SENHA);
+if (!GITHUB_CONFIG) {
+  throw new Error("Configuração inválida");
+}
+
+// ==================================================
+// TODO O RESTO DO SEU CÓDIGO CONTINUA TUDO IGUAL AQUI
+// (todas as funções, cálculos, PDF, botões, etc.)
+// ==================================================
 
 const { jsPDF } = window.jspdf;
 
@@ -32,13 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarDesconto();
     configurarAcrescimo();
 
-    // ✅ BOTÃO ADICIONAR NOVO SERVIÇO - CORRIGIDO
+    // ✅ BOTÃO ADICIONAR NOVO SERVIÇO - FUNCIONANDO
     document.getElementById('adicionarServico').addEventListener('click', () => {
         const container = document.getElementById('listaServicos');
         const modelo = document.querySelector('.servico-item');
         const novo = modelo.cloneNode(true);
         
-        // Limpa os valores do novo serviço
         novo.querySelector('.tipoServico').value = '';
         novo.querySelector('.descricaoServico').value = '';
         novo.querySelector('.valorServico').value = '';
@@ -46,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         container.appendChild(novo);
 
-        // Botão remover do novo item
         novo.querySelector('.removerServico').addEventListener('click', () => {
             if (document.querySelectorAll('.servico-item').length > 1) {
                 novo.remove();
@@ -54,16 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Quando mudar o tipo de serviço
         novo.querySelector('.tipoServico').addEventListener('change', function() {
             calcularTotal();
         });
 
-        // Botão buscar valor
         novo.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(novo));
     });
 
-    // Remover serviço inicial
     document.querySelector('.removerServico').addEventListener('click', function() {
         if (document.querySelectorAll('.servico-item').length > 1) {
             this.parentElement.remove();
@@ -71,13 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Buscar valor no primeiro serviço
     document.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(document.querySelector('.servico-item')));
 
-    // Gerar PDF
     document.getElementById('gerarOrcamento').addEventListener('click', gerarOrcamento);
 
-    // Botões de nuvem e arquivo
     document.getElementById('exportarHistorico').addEventListener('click', exportarHistorico);
     document.getElementById('importarHistorico').addEventListener('click', () => document.getElementById('inputImportar').click());
     document.getElementById('salvarNoGithub').addEventListener('click', salvarNoGithub);
@@ -520,4 +538,3 @@ window.exportarHistorico = exportarHistorico;
 window.importarHistorico = importarHistorico;
 window.salvarNoGithub = salvarNoGithub;
 window.carregarDoGithub = carregarDoGithub;
-
