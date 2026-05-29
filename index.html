@@ -3,125 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orçamento de Serviços de Informática</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Orçamento de Serviços - Informática</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Fonte estilo pichação para a assinatura -->
-    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .valor-sugerido {
+            display: none;
+            color: #22c55e;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .campo-personalizado {
+            display: none;
+            gap: 8px;
+            margin-top: 8px;
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <header class="cabecalho">
-            <h1>📋 Orçamento de Serviços de Informática</h1>
-            <p>Preencha os dados, adicione serviços e gere seu orçamento em PDF</p>
-        </header>
+<body class="max-w-2xl mx-auto p-4">
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">💻 Orçamento de Serviços de Informática</h1>
 
-        <section class="card">
-            <h2>👤 Dados do Cliente <span class="opcional">(todos opcionais)</span></h2>
-            <div class="grid-dados">
-                <input type="text" id="nomeCliente" placeholder="Nome completo">
-                <input type="text" id="cpfCliente" placeholder="CPF" maxlength="14">
-                <input type="email" id="emailCliente" placeholder="E-mail">
-                <input type="tel" id="telefoneCliente" placeholder="Telefone (WhatsApp)">
+    <!-- Dados do Cliente -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 text-gray-700">👤 Dados do Cliente</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Nome Completo</label>
+                <input type="text" id="nomeCliente" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
-        </section>
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">CPF</label>
+                <input type="text" id="cpfCliente" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">E-mail</label>
+                <input type="email" id="emailCliente" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Telefone</label>
+                <input type="text" id="telefoneCliente" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+    </div>
 
-        <section class="card">
-            <h2>🛠️ Serviços Realizados</h2>
-            <div id="listaServicos">
-                <div class="servico-item">
-                    <select class="tipoServico">
-                        <option value="">Selecione um serviço</option>
-                        <optgroup label="💻 Atendimento Externo (vou até o local)">
-                            <option value="Deslocamento até residência/empresa - R$ 60,00">Deslocamento até residência/empresa - R$ 60,00</option>
-                            <option value="Atendimento técnico completo no local - R$ 120,00">Atendimento técnico completo no local - R$ 120,00</option>
-                            <option value="Instalação e configuração de rede Wi-Fi no local - R$ 180,00">Instalação e configuração de rede Wi-Fi no local - R$ 180,00</option>
-                            <option value="Instalação de equipamentos e periféricos no local - R$ 100,00">Instalação de equipamentos e periféricos no local - R$ 100,00</option>
-                            <option value="Manutenção de computadores/notebooks no local - R$ 150,00">Manutenção de computadores/notebooks no local - R$ 150,00</option>
-                            <option value="Configuração de servidores/roteadores no local - R$ 250,00">Configuração de servidores/roteadores no local - R$ 250,00</option>
-                            <option value="Instalação de câmeras e sistema de monitoramento - R$ 220,00">Instalação de câmeras e sistema de monitoramento - R$ 220,00</option>
-                            <option value="Instalação e configuração de impressoras na rede - R$ 130,00">Instalação e configuração de impressoras na rede - R$ 130,00</option>
-                        </optgroup>
-                        <optgroup label="🖥️ Serviços Técnicos">
-                            <option value="Formatação e instalação de sistema operacional - R$ 150,00">Formatação e instalação de sistema operacional - R$ 150,00</option>
-                            <option value="Instalação de programas e softwares - R$ 80,00">Instalação de programas e softwares - R$ 80,00</option>
-                            <option value="Remoção de vírus, malwares e otimização - R$ 100,00">Remoção de vírus, malwares e otimização - R$ 100,00</option>
-                            <option value="Troca de peças e componentes - R$ 90,00">Troca de peças e componentes - R$ 90,00</option>
-                            <option value="Limpeza interna e manutenção preventiva - R$ 120,00">Limpeza interna e manutenção preventiva - R$ 120,00</option>
-                            <option value="Recuperação de dados (HD, SSD, Cartão) - R$ 200,00">Recuperação de dados (HD, SSD, Cartão) - R$ 200,00</option>
-                            <option value="Configuração de e-mails, nuvem e backups - R$ 70,00">Configuração de e-mails, nuvem e backups - R$ 70,00</option>
-                            <option value="Montagem de computador sob medida - R$ 180,00">Montagem de computador sob medida - R$ 180,00</option>
-                            <option value="Consultoria e suporte técnico - R$ 100,00/hora">Consultoria e suporte técnico - R$ 100,00/hora</option>
-                            <option value="Configuração de rede cabeada - R$ 160,00">Configuração de rede cabeada - R$ 160,00</option>
-                            <option value="Atualização de BIOS e drivers - R$ 80,00">Atualização de BIOS e drivers - R$ 80,00</option>
-                        </optgroup>
-                        <optgroup label="🔧 Outros">
-                            <option value="Outro">Serviço Personalizado (buscar valor justo)</option>
-                        </optgroup>
-                    </select>
-                    <div class="campo-personalizado" style="display: none;">
-                        <input type="text" class="descricaoServico" placeholder="Descreva o serviço (ex: Instalação de sistema de alarme)">
-                        <button type="button" class="btn-buscar">🔍 Buscar valor justo</button>
-                        <span class="valor-sugerido" style="display: none;">Valor médio: R$ <span id="valorSugerido">0,00</span></span>
-                        <input type="text" class="valorServico" placeholder="Digite o valor final R$">
+    <!-- Serviços -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 text-gray-700">🛠 Serviços Prestados</h2>
+        <div id="listaServicos">
+            <div class="servico-item border-b border-gray-200 pb-4 mb-4">
+                <div class="grid md:grid-cols-3 gap-3 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Tipo de Serviço</label>
+                        <select class="tipoServico w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Escolha...</option>
+                            <option value="Deslocamento - R$ 55,00">Deslocamento - R$ 55,00</option>
+                            <option value="Atendimento Residencial - R$ 110,00">Atendimento Residencial - R$ 110,00</option>
+                            <option value="Atendimento Empresarial - R$ 130,00">Atendimento Empresarial - R$ 130,00</option>
+                            <option value="Configuração Rede Wi-Fi - R$ 170,00">Configuração Rede Wi-Fi - R$ 170,00</option>
+                            <option value="Formatação de Computador - R$ 140,00">Formatação de Computador - R$ 140,00</option>
+                            <option value="Instalação de Programa/Software - R$ 75,00">Instalação de Programa/Software - R$ 75,00</option>
+                            <option value="Remoção de Vírus/Malware - R$ 90,00">Remoção de Vírus/Malware - R$ 90,00</option>
+                            <option value="Limpeza Interna e Troca de Pasta Térmica - R$ 110,00">Limpeza Interna e Troca de Pasta Térmica - R$ 110,00</option>
+                            <option value="Recuperação de Dados - R$ 210,00">Recuperação de Dados - R$ 210,00</option>
+                            <option value="Instalação/Configuração Câmeras - R$ 215,00">Instalação/Configuração Câmeras - R$ 215,00</option>
+                            <option value="Manutenção Servidor - R$ 250,00">Manutenção Servidor - R$ 250,00</option>
+                            <option value="Consultoria e Orientação - R$ 95,00">Consultoria e Orientação - R$ 95,00</option>
+                            <option value="Troca de Peça/Componente - R$ 85,00">Troca de Peça/Componente - R$ 85,00</option>
+                            <option value="Backup de Arquivos - R$ 70,00">Backup de Arquivos - R$ 70,00</option>
+                            <option value="Installation/Manutenção Impressora - R$ 125,00">Instalação/Manutenção Impressora - R$ 125,00</option>
+                            <option value="Rede Cabeada / Instalação Cabos - R$ 150,00">Rede Cabeada / Instalação Cabos - R$ 150,00</option>
+                            <option value="Outro">Outro (Personalizado)</option>
+                        </select>
                     </div>
-                    <button type="button" class="removerServico">×</button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Descrição</label>
+                        <input type="text" class="descricaoServico w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Conserto placa mãe">
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Valor R$</label>
+                            <input type="number" step="0.01" class="valorServico w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0,00">
+                        </div>
+                        <button type="button" class="btn-buscar bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 transition">🔍</button>
+                        <button type="button" class="removerServico bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 transition">🗑</button>
+                    </div>
+                </div>
+                <div class="campo-personalizado">
+                    <span class="text-sm text-gray-500">Valor médio sugerido: R$ <span id="valorSugerido"></span></span>
                 </div>
             </div>
-            <button type="button" id="adicionarServico" class="btn-adicionar">+ Adicionar Novo Serviço</button>
+        </div>
+        <button type="button" id="adicionarServico" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition mt-2">+ Adicionar Novo Serviço</button>
+    </div>
 
-            <!-- 💸 DESCONTO -->
-            <div class="desconto-box">
-                <h3>💸 Aplicar Desconto</h3>
-                <div class="desconto-opcoes">
-                    <label>
+    <!-- Ajustes: Desconto e Acréscimo -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Desconto -->
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-2">💸 Desconto</h3>
+                <div class="flex gap-3 mb-2">
+                    <label class="flex items-center gap-1 cursor-pointer">
                         <input type="radio" name="tipoDesconto" value="nenhum" checked> Nenhum
                     </label>
-                    <label>
+                    <label class="flex items-center gap-1 cursor-pointer">
                         <input type="radio" name="tipoDesconto" value="valor"> Valor R$
-                        <input type="number" id="descontoValor" placeholder="0,00" min="0" step="0.01" disabled>
                     </label>
-                    <label>
-                        <input type="radio" name="tipoDesconto" value="porcentagem"> Porcentagem %
-                        <input type="number" id="descontoPorc" placeholder="0" min="0" max="100" disabled>
+                    <label class="flex items-center gap-1 cursor-pointer">
+                        <input type="radio" name="tipoDesconto" value="porcentagem"> %
                     </label>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="descontoValor" step="0.01" disabled class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Valor R$">
+                    <input type="number" id="descontoPorc" step="0.1" disabled class="w-full border border-gray-300 rounded px-3 py-2" placeholder="%">
                 </div>
             </div>
 
-            <!-- ➕ ACRÉSCIMO / TAXA EXTRA -->
-            <div class="acrescimo-box">
-                <h3>➕ Acréscimo / Taxa Extra</h3>
-                <div class="acrescimo-opcoes">
-                    <label>
+            <!-- Acréscimo / Taxa Extra -->
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-2">📈 Acréscimo / Taxa Extra</h3>
+                <div class="flex gap-3 mb-2">
+                    <label class="flex items-center gap-1 cursor-pointer">
                         <input type="radio" name="tipoAcrescimo" value="nenhum" checked> Nenhum
                     </label>
-                    <label>
+                    <label class="flex items-center gap-1 cursor-pointer">
                         <input type="radio" name="tipoAcrescimo" value="valor"> Valor R$
-                        <input type="number" id="acrescimoValor" placeholder="0,00" min="0" step="0.01" disabled>
                     </label>
-                    <label>
-                        <input type="radio" name="tipoAcrescimo" value="porcentagem"> Porcentagem %
-                        <input type="number" id="acrescimoPorc" placeholder="0" min="0" max="100" disabled>
+                    <label class="flex items-center gap-1 cursor-pointer">
+                        <input type="radio" name="tipoAcrescimo" value="porcentagem"> %
                     </label>
                 </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="acrescimoValor" step="0.01" disabled class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Valor R$">
+                    <input type="number" id="acrescimoPorc" step="0.1" disabled class="w-full border border-gray-300 rounded px-3 py-2" placeholder="%">
+                </div>
             </div>
+        </div>
+    </div>
 
-            <div class="total-box">
-                <p class="subtotal">Subtotal: R$ <span id="subtotal">0,00</span></p>
-                <p class="valor-desconto" style="display: none;">Desconto: - R$ <span id="valorDesconto">0,00</span></p>
-                <p class="valor-acrescimo" style="display: none;">Acréscimo: + R$ <span id="valorAcrescimo">0,00</span></p>
-                <h3>Valor Final: R$ <span id="valorTotal">0,00</span></h3>
-            </div>
+    <!-- Resumo de Valores -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6 text-center">
+        <div class="text-lg text-gray-700 mb-1">Subtotal: <span id="subtotal" class="font-medium">0,00</span></div>
+        <div class="valor-desconto text-sm text-red-600 mb-1" style="display: none;">Desconto: - R$ <span id="valorDesconto"></span></div>
+        <div class="valor-acrescimo text-sm text-blue-600 mb-1" style="display: none;">Acréscimo: + R$ <span id="valorAcrescimo"></span></div>
+        <div class="text-2xl font-bold text-green-700 mt-2">Valor Final: R$ <span id="valorTotal">0,00</span></div>
+    </div>
 
-            <button type="button" id="gerarOrcamento" class="btn-gerar">📄 Gerar Orçamento em PDF</button>
-        </section>
+    <!-- Botão Gerar PDF -->
+    <button id="gerarOrcamento" class="w-full bg-indigo-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition mb-8">📄 Gerar Orçamento em PDF</button>
 
-        <section class="card historico-section">
-            <h2>📚 Histórico de Orçamentos</h2>
-            <ul id="listaHistorico"></ul>
-            <p id="vazioHistorico" class="vazio">Nenhum orçamento salvo ainda.</p>
-        </section>
+    <!-- Histórico -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4 text-gray-700">📚 Histórico de Orçamentos</h3>
+
+        <!-- 🆕 BOTÕES DE NUVEM E ARQUIVO -->
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0;">
+            <button id="exportarHistorico" style="background: #2ecc71; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">💾 Salvar Arquivo</button>
+            <button id="importarHistorico" style="background: #9b59b6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">📂 Carregar Arquivo</button>
+            <button id="salvarNoGithub" style="background: #f39c12; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">☁️ Salvar na Nuvem</button>
+            <button id="carregarDoGithub" style="background: #34495e; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">☁️ Carregar da Nuvem</button>
+            <input type="file" id="inputImportar" accept=".json" style="display: none;">
+        </div>
+
+        <ul id="listaHistorico" class="space-y-3"></ul>
+        <p id="vazioHistorico" class="text-muted text-center py-3 text-gray-500">Nenhum orçamento salvo ainda.</p>
     </div>
 
     <script src="script.js"></script>
