@@ -6,48 +6,78 @@
     <title>Orçamento de Serviços de Informática</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Orçamento de Serviços de Informática</h1>
+        <header class="cabecalho">
+            <h1>📋 Orçamento de Serviços de Informática</h1>
+            <p>Preencha os dados, adicione serviços e gere seu orçamento em PDF</p>
         </header>
 
-        <section class="formulario">
-            <h2>Dados do Cliente</h2>
-            <input type="text" id="nomeCliente" placeholder="Nome completo (opcional)">
-            <input type="text" id="cpfCliente" placeholder="CPF (opcional)">
-            <input type="email" id="emailCliente" placeholder="E-mail (opcional)">
-            <input type="tel" id="telefoneCliente" placeholder="Telefone (opcional)">
+        <section class="card">
+            <h2>👤 Dados do Cliente <span class="opcional">(todos opcionais)</span></h2>
+            <div class="grid-dados">
+                <input type="text" id="nomeCliente" placeholder="Nome completo">
+                <input type="text" id="cpfCliente" placeholder="CPF" maxlength="14">
+                <input type="email" id="emailCliente" placeholder="E-mail">
+                <input type="tel" id="telefoneCliente" placeholder="Telefone (WhatsApp)">
+            </div>
+        </section>
 
-            <h2>Serviços</h2>
+        <section class="card">
+            <h2>🛠️ Serviços Realizados</h2>
             <div id="listaServicos">
-                <div class="servico">
+                <div class="servico-item">
                     <select class="tipoServico">
                         <option value="">Selecione um serviço</option>
-                        <option value="Instalação de Software - R$ 80,00">Instalação de Software - R$ 80,00</option>
-                        <option value="Formatação e Instalação de Sistema - R$ 150,00">Formatação e Instalação de Sistema - R$ 150,00</option>
-                        <option value="Manutenção de Computador - R$ 120,00">Manutenção de Computador - R$ 120,00</option>
-                        <option value="Configuração de Rede - R$ 180,00">Configuração de Rede - R$ 180,00</option>
-                        <option value="Remoção de Vírus e Malwares - R$ 100,00">Remoção de Vírus e Malwares - R$ 100,00</option>
-                        <option value="Outro">Outro (personalizado)</option>
+                        <optgroup label="💻 Atendimento Interno (no local do cliente)">
+                            <option value="Deslocamento até o local - R$ 60,00">Deslocamento até o local - R$ 60,00</option>
+                            <option value="Atendimento técnico residencial/empresarial - R$ 120,00">Atendimento técnico residencial/empresarial - R$ 120,00</option>
+                            <option value="Instalação e configuração de rede Wi-Fi no local - R$ 180,00">Instalação e configuração de rede Wi-Fi no local - R$ 180,00</option>
+                            <option value="Instalação de equipamentos e periféricos - R$ 100,00">Instalação de equipamentos e periféricos - R$ 100,00</option>
+                            <option value="Manutenção de computadores e notebooks no local - R$ 150,00">Manutenção de computadores e notebooks no local - R$ 150,00</option>
+                            <option value="Configuração de servidores e roteadores no local - R$ 250,00">Configuração de servidores e roteadores no local - R$ 250,00</option>
+                            <option value="Instalação de câmeras e sistema de monitoramento - R$ 220,00">Instalação de câmeras e sistema de monitoramento - R$ 220,00</option>
+                        </optgroup>
+                        <optgroup label="🖥️ Serviços Técnicos">
+                            <option value="Formatação e instalação de sistema operacional - R$ 150,00">Formatação e instalação de sistema operacional - R$ 150,00</option>
+                            <option value="Instalação de programas e softwares - R$ 80,00">Instalação de programas e softwares - R$ 80,00</option>
+                            <option value="Remoção de vírus, malwares e otimização - R$ 100,00">Remoção de vírus, malwares e otimização - R$ 100,00</option>
+                            <option value="Troca de peças e componentes - R$ 90,00">Troca de peças e componentes - R$ 90,00</option>
+                            <option value="Limpeza interna e manutenção preventiva - R$ 120,00">Limpeza interna e manutenção preventiva - R$ 120,00</option>
+                            <option value="Recuperação de dados - R$ 200,00">Recuperação de dados - R$ 200,00</option>
+                            <option value="Configuração de e-mails e nuvem - R$ 70,00">Configuração de e-mails e nuvem - R$ 70,00</option>
+                            <option value="Montagem de computador sob medida - R$ 180,00">Montagem de computador sob medida - R$ 180,00</option>
+                            <option value="Configuração de impressoras e compartilhamento - R$ 130,00">Configuração de impressoras e compartilhamento - R$ 130,00</option>
+                            <option value="Consultoria e suporte técnico - R$ 100,00/hora">Consultoria e suporte técnico - R$ 100,00/hora</option>
+                        </optgroup>
+                        <optgroup label="🔧 Outros">
+                            <option value="Outro">Serviço Personalizado (buscar valor de mercado)</option>
+                        </optgroup>
                     </select>
-                    <input type="text" class="descricaoExtra" placeholder="Descrição e valor (ex: Consultoria - R$ 200,00)" style="display: none;">
+                    <div class="campo-personalizado" style="display: none;">
+                        <input type="text" class="descricaoServico" placeholder="Descreva o serviço (ex: Instalação de sistema de alarme)">
+                        <button type="button" class="btn-buscar">🔍 Buscar valor justo</button>
+                        <span class="valor-sugerido" style="display: none;">Valor médio: R$ <span id="valorSugerido">0,00</span></span>
+                        <input type="text" class="valorServico" placeholder="Digite o valor final R$">
+                    </div>
                     <button type="button" class="removerServico">×</button>
                 </div>
             </div>
-            <button type="button" id="adicionarServico">+ Adicionar Serviço</button>
+            <button type="button" id="adicionarServico" class="btn-adicionar">+ Adicionar Novo Serviço</button>
 
-            <div class="total">
-                <h3>Valor Total: R$ <span id="valorTotal">0,00</span></h3>
+            <div class="total-box">
+                <h3>Valor Total a Pagar: <span id="valorTotal">0,00</span></h3>
             </div>
 
-            <button type="button" id="gerarOrcamento">Gerar Orçamento e Salvar</button>
+            <button type="button" id="gerarOrcamento" class="btn-gerar">📄 Gerar Orçamento em PDF</button>
         </section>
 
-        <section class="historico">
-            <h2>Histórico de Orçamentos</h2>
+        <section class="card historico-section">
+            <h2>📚 Histórico de Orçamentos</h2>
             <ul id="listaHistorico"></ul>
+            <p id="vazioHistorico" class="vazio">Nenhum orçamento salvo ainda.</p>
         </section>
     </div>
 
