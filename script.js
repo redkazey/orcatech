@@ -1,5 +1,13 @@
 const { jsPDF } = window.jspdf;
 
+// 🔴 DADOS DO SEU GITHUB (JÁ CONFIGURADOS!)
+const GITHUB_CONFIG = {
+  usuario: "redkazey",         
+  repositorio: "orcatech",     
+  nomeArquivo: "historico_orcamentos.json",
+  token: "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" 
+};
+
 // Banco de valores médios de mercado
 const valoresMercado = {
     "deslocamento": 55,
@@ -76,6 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gerar PDF
     document.getElementById('gerarOrcamento').addEventListener('click', gerarOrcamento);
+
+    // Botões de Exportar / Importar / GitHub
+    document.getElementById('exportarHistorico').addEventListener('click', exportarHistorico);
+    document.getElementById('importarHistorico').addEventListener('click', () => document.getElementById('inputImportar').click());
+    document.getElementById('salvarNoGithub').addEventListener('click', salvarNoGithub);
+    document.getElementById('carregarDoGithub').addEventListener('click', carregarDoGithub);
+    document.getElementById('inputImportar').addEventListener('change', importarHistorico);
 });
 
 // Configurar lógica do desconto (valor ou porcentagem)
@@ -361,14 +376,26 @@ function gerarOrcamento() {
     // Salva o arquivo
     doc.save(nomeArquivo);
     
-    // Salva dados completos para reedição
+    // ✅ SALVA TODOS OS DADOS CORRETAMENTE PARA REEDIÇÃO
     const dadosCompletos = {
-        nomeArquivo,
+        nomeArquivo: nomeArquivo,
         dataHora: dataHora.toLocaleString('pt-BR'),
         conteudo: doc.output('blob'),
-        dadosCliente: { nome, cpf, email, telefone },
+        dadosCliente: { 
+            nome: nome, 
+            cpf: cpf, 
+            email: email, 
+            telefone: telefone 
+        },
         servicos: servicos,
-        ajustes: { tipoDesconto, valorDesconto, porcDesconto, tipoAcrescimo, valorAcrescimo, porcAcrescimo }
+        ajustes: { 
+            tipoDesconto: tipoDesconto, 
+            valorDesconto: valorDesconto, 
+            porcDesconto: porcDesconto, 
+            tipoAcrescimo: tipoAcrescimo, 
+            valorAcrescimo: valorAcrescimo, 
+            porcAcrescimo: porcAcrescimo 
+        }
     };
     
     salvarNoHistorico(dadosCompletos);
@@ -390,15 +417,21 @@ function carregarHistorico() {
 
     historico.forEach((item, index) => {
         const li = document.createElement('li');
+        
+        // ✅ MOSTRA O NOME DO CLIENTE NO HISTÓRICO
+        const nomeClienteExibicao = (item.dadosCliente && item.dadosCliente.nome) 
+            ? `Cliente: ${item.dadosCliente.nome}` 
+            : 'Cliente não informado';
+
         li.innerHTML = `
             <div>
-                <strong>${item.nomeArquivo}</strong>
-                <small>${item.dataHora}</small>
+                <strong>${nomeClienteExibicao}</strong><br>
+                <small>${item.nomeArquivo} | ${item.dataHora}</small>
             </div>
-            <div>
-                <button onclick="reeditarOrcamento(${index})">✏️ Reeditar</button>
-                <button onclick="baixarNovamente(${index})">⬇ Baixar</button>
-                <button onclick="excluirDoHistorico(${index})">🗑 Excluir</button>
+            <div style="margin-top: 8px;">
+                <button onclick="reeditarOrcamento(${index})" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; margin-right: 5px; cursor: pointer;">✏️ Editar</button>
+                <button onclick="baixarNovamente(${index})" style="background: #3498db; color: white; border: none; padding: 8px 12px; border-radius: 4px; margin-right: 5px; cursor: pointer;">⬇ Baixar</button>
+                <button onclick="excluirDoHistorico(${index})" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">🗑 Excluir</button>
             </div>
         `;
         lista.appendChild(li);
@@ -421,7 +454,7 @@ function baixarNovamente(index) {
     link.click();
 }
 
-// ✨ NOVA FUNÇÃO: Reeditar orçamento salvo
+// ✨ FUNÇÃO DE REEDIÇÃO CORRIGIDA
 function reeditarOrcamento(index) {
     const historico = JSON.parse(localStorage.getItem('orcamentos')) || [];
     const item = historico[index];
@@ -452,7 +485,7 @@ function reeditarOrcamento(index) {
     document.getElementById('acrescimoPorc').value = '';
     document.getElementById('acrescimoPorc').disabled = true;
 
-    // 2. Preencher dados do cliente
+    // 2. Preencher dados do cliente (CORRIGIDO)
     if (item.dadosCliente) {
         document.getElementById('nomeCliente').value = item.dadosCliente.nome || '';
         document.getElementById('cpfCliente').value = item.dadosCliente.cpf || '';
@@ -460,7 +493,7 @@ function reeditarOrcamento(index) {
         document.getElementById('telefoneCliente').value = item.dadosCliente.telefone || '';
     }
 
-    // 3. Preencher serviços
+    // 3. Preencher serviços (CORRIGIDO)
     if (item.servicos && item.servicos.length > 0) {
         item.servicos.forEach((servico, idx) => {
             let elemento;
@@ -505,7 +538,7 @@ function reeditarOrcamento(index) {
         });
     }
 
-    // 4. Preencher ajustes (desconto e acréscimo)
+    // 4. Preencher ajustes (desconto e acréscimo) - CORRIGIDO
     if (item.ajustes) {
         // Desconto
         if (item.ajustes.tipoDesconto) {
@@ -532,8 +565,137 @@ function reeditarOrcamento(index) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// 🆕 Função para EXPORTAR todo o histórico para um arquivo
+function exportarHistorico() {
+    const historico = localStorage.getItem('orcamentos') || '[]';
+    const blob = new Blob([historico], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `historico_orcamentos_${new Date().toLocaleString('pt-BR').replace(/[\/: ]/g, '-')}.json`;
+    link.click();
+    alert('✅ Histórico exportado com sucesso! Guarde esse arquivo para não perder nada.');
+}
+
+// 🆕 Função para IMPORTAR o histórico de um arquivo
+function importarHistorico(e) {
+    const arquivo = e.target.files[0];
+    if (!arquivo) return;
+
+    const leitor = new FileReader();
+    leitor.onload = function(evento) {
+        try {
+            const dadosImportados = JSON.parse(evento.target.result);
+            if (!Array.isArray(dadosImportados)) throw new Error('Arquivo inválido');
+
+            // Pergunta se quer juntar ou substituir
+            const opcao = confirm('Deseja JUNTAR os históricos ou SUBSTITUIR o atual?\n\nOK = JUNTAR\nCANCELAR = SUBSTITUIR');
+            
+            let historicoAtual = JSON.parse(localStorage.getItem('orcamentos')) || [];
+            
+            if (opcao) {
+                // Junta os dois, removendo duplicatas simples
+                const idsExistentes = historicoAtual.map(i => i.nomeArquivo + i.dataHora);
+                const novos = dadosImportados.filter(i => !idsExistentes.includes(i.nomeArquivo + i.dataHora));
+                historicoAtual = [...novos, ...historicoAtual];
+            } else {
+                historicoAtual = dadosImportados;
+            }
+
+            localStorage.setItem('orcamentos', JSON.stringify(historicoAtual));
+            carregarHistorico();
+            alert('✅ Histórico importado com sucesso!');
+
+        } catch (erro) {
+            alert('❌ Erro ao importar: Arquivo corrompido ou inválido.');
+        }
+        // Limpa o input para permitir importar o mesmo arquivo novamente
+        e.target.value = '';
+    };
+    leitor.readAsText(arquivo);
+}
+
+// ☁️ NOVO: SALVAR HISTÓRICO NO GITHUB
+async function salvarNoGithub() {
+    try {
+        const historico = localStorage.getItem('orcamentos') || '[]';
+        const conteudoBase64 = btoa(unescape(encodeURIComponent(historico)));
+
+        // 1. Pegar o arquivo atual (se existir) para pegar o SHA
+        let sha = '';
+        try {
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.usuario}/${GITHUB_CONFIG.repositorio}/contents/${GITHUB_CONFIG.nomeArquivo}`, {
+                headers: { Authorization: `token ${GITHUB_CONFIG.token}` }
+            });
+            if (res.ok) {
+                const dados = await res.json();
+                sha = dados.sha;
+            }
+        } catch (e) {}
+
+        // 2. Enviar novo conteúdo
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.usuario}/${GITHUB_CONFIG.repositorio}/contents/${GITHUB_CONFIG.nomeArquivo}`, {
+            method: 'PUT',
+            headers: {
+                Authorization: `token ${GITHUB_CONFIG.token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Atualização automática - ${new Date().toLocaleString('pt-BR')}`,
+                content: conteudoBase64,
+                sha: sha
+            })
+        });
+
+        if (res.ok) alert('✅ Histórico salvo na NUVEM (GitHub) com sucesso!');
+        else throw new Error('Erro na requisição');
+
+    } catch (erro) {
+        alert('❌ Erro ao salvar no GitHub: Verifique os dados!');
+    }
+}
+
+// ☁️ NOVO: CARREGAR HISTÓRICO DO GITHUB
+async function carregarDoGithub() {
+    try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.usuario}/${GITHUB_CONFIG.repositorio}/contents/${GITHUB_CONFIG.nomeArquivo}`, {
+            headers: { Authorization: `token ${GITHUB_CONFIG.token}` }
+        });
+
+        if (!res.ok) throw new Error('Arquivo não encontrado');
+
+        const dados = await res.json();
+        const conteudo = decodeURIComponent(escape(atob(dados.content)));
+        const dadosImportados = JSON.parse(conteudo);
+
+        if (!Array.isArray(dadosImportados)) throw new Error('Formato inválido');
+
+        // Mesma lógica de juntar/substituir
+        const opcao = confirm('Deseja JUNTAR o histórico da nuvem ou SUBSTITUIR o atual?\n\nOK = JUNTAR\nCANCELAR = SUBSTITUIR');
+        let historicoAtual = JSON.parse(localStorage.getItem('orcamentos')) || [];
+
+        if (opcao) {
+            const idsExistentes = historicoAtual.map(i => i.nomeArquivo + i.dataHora);
+            const novos = dadosImportados.filter(i => !idsExistentes.includes(i.nomeArquivo + i.dataHora));
+            historicoAtual = [...novos, ...historicoAtual];
+        } else {
+            historicoAtual = dadosImportados;
+        }
+
+        localStorage.setItem('orcamentos', JSON.stringify(historicoAtual));
+        carregarHistorico();
+        alert('✅ Histórico carregado da NUVEM com sucesso!');
+
+    } catch (erro) {
+        alert('❌ Erro ao carregar: ' + erro.message);
+    }
+}
+
 // Disponibiliza funções globalmente
 window.excluirDoHistorico = excluirDoHistorico;
 window.baixarNovamente = baixarNovamente;
 window.reeditarOrcamento = reeditarOrcamento;
+window.exportarHistorico = exportarHistorico;
+window.importarHistorico = importarHistorico;
+window.salvarNoGithub = salvarNoGithub;
+window.carregarDoGithub = carregarDoGithub;
 
