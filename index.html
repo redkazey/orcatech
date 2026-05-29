@@ -31,14 +31,15 @@
                 <div class="servico-item">
                     <select class="tipoServico">
                         <option value="">Selecione um serviço</option>
-                        <optgroup label="💻 Atendimento Interno (no local do cliente)">
-                            <option value="Deslocamento até o local - R$ 60,00">Deslocamento até o local - R$ 60,00</option>
-                            <option value="Atendimento técnico residencial/empresarial - R$ 120,00">Atendimento técnico residencial/empresarial - R$ 120,00</option>
+                        <optgroup label="💻 Atendimento Externo (vou até o local)">
+                            <option value="Deslocamento até residência/empresa - R$ 60,00">Deslocamento até residência/empresa - R$ 60,00</option>
+                            <option value="Atendimento técnico completo no local - R$ 120,00">Atendimento técnico completo no local - R$ 120,00</option>
                             <option value="Instalação e configuração de rede Wi-Fi no local - R$ 180,00">Instalação e configuração de rede Wi-Fi no local - R$ 180,00</option>
-                            <option value="Instalação de equipamentos e periféricos - R$ 100,00">Instalação de equipamentos e periféricos - R$ 100,00</option>
-                            <option value="Manutenção de computadores e notebooks no local - R$ 150,00">Manutenção de computadores e notebooks no local - R$ 150,00</option>
-                            <option value="Configuração de servidores e roteadores no local - R$ 250,00">Configuração de servidores e roteadores no local - R$ 250,00</option>
+                            <option value="Instalação de equipamentos e periféricos no local - R$ 100,00">Instalação de equipamentos e periféricos no local - R$ 100,00</option>
+                            <option value="Manutenção de computadores/notebooks no local - R$ 150,00">Manutenção de computadores/notebooks no local - R$ 150,00</option>
+                            <option value="Configuração de servidores/roteadores no local - R$ 250,00">Configuração de servidores/roteadores no local - R$ 250,00</option>
                             <option value="Instalação de câmeras e sistema de monitoramento - R$ 220,00">Instalação de câmeras e sistema de monitoramento - R$ 220,00</option>
+                            <option value="Instalação e configuração de impressoras na rede - R$ 130,00">Instalação e configuração de impressoras na rede - R$ 130,00</option>
                         </optgroup>
                         <optgroup label="🖥️ Serviços Técnicos">
                             <option value="Formatação e instalação de sistema operacional - R$ 150,00">Formatação e instalação de sistema operacional - R$ 150,00</option>
@@ -46,14 +47,15 @@
                             <option value="Remoção de vírus, malwares e otimização - R$ 100,00">Remoção de vírus, malwares e otimização - R$ 100,00</option>
                             <option value="Troca de peças e componentes - R$ 90,00">Troca de peças e componentes - R$ 90,00</option>
                             <option value="Limpeza interna e manutenção preventiva - R$ 120,00">Limpeza interna e manutenção preventiva - R$ 120,00</option>
-                            <option value="Recuperação de dados - R$ 200,00">Recuperação de dados - R$ 200,00</option>
-                            <option value="Configuração de e-mails e nuvem - R$ 70,00">Configuração de e-mails e nuvem - R$ 70,00</option>
+                            <option value="Recuperação de dados (HD, SSD, Cartão) - R$ 200,00">Recuperação de dados (HD, SSD, Cartão) - R$ 200,00</option>
+                            <option value="Configuração de e-mails, nuvem e backups - R$ 70,00">Configuração de e-mails, nuvem e backups - R$ 70,00</option>
                             <option value="Montagem de computador sob medida - R$ 180,00">Montagem de computador sob medida - R$ 180,00</option>
-                            <option value="Configuração de impressoras e compartilhamento - R$ 130,00">Configuração de impressoras e compartilhamento - R$ 130,00</option>
                             <option value="Consultoria e suporte técnico - R$ 100,00/hora">Consultoria e suporte técnico - R$ 100,00/hora</option>
+                            <option value="Configuração de rede cabeada - R$ 160,00">Configuração de rede cabeada - R$ 160,00</option>
+                            <option value="Atualização de BIOS e drivers - R$ 80,00">Atualização de BIOS e drivers - R$ 80,00</option>
                         </optgroup>
                         <optgroup label="🔧 Outros">
-                            <option value="Outro">Serviço Personalizado (buscar valor de mercado)</option>
+                            <option value="Outro">Serviço Personalizado (buscar valor justo)</option>
                         </optgroup>
                     </select>
                     <div class="campo-personalizado" style="display: none;">
@@ -68,7 +70,7 @@
             <button type="button" id="adicionarServico" class="btn-adicionar">+ Adicionar Novo Serviço</button>
 
             <div class="total-box">
-                <h3>Valor Total a Pagar: <span id="valorTotal">0,00</span></h3>
+                <h3>Valor Total a Pagar: R$ <span id="valorTotal">0,00</span></h3>
             </div>
 
             <button type="button" id="gerarOrcamento" class="btn-gerar">📄 Gerar Orçamento em PDF</button>
