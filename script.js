@@ -1,27 +1,3 @@
-const P1 = '23';
-const P2 = '11';
-const P3 = '92';
-const PPW = P1 + P2 + P3;
-
-function decodificarConfig(textoCodificado, senha) {
-  try {
-    let decodificado = atob(textoCodificado);
-    let resultado = "";
-    for (let i = 0; i < decodificado.length; i++) {
-      resultado += String.fromCharCode(decodificado.charCodeAt(i) ^ senha.charCodeAt(i % senha.length));
-    }
-    return eval(resultado);
-  } catch (e) {
-    alert('❌ Erro: Arquivo de configuração corrompido ou senha errada!');
-    return null;
-  }
-}
-
-const GITHUB_CONFIG = decodificarConfig(CONFIG_CRIPTOGRAFADO, PPW);
-if (!GITHUB_CONFIG) {
-  throw new Error("Configuração inválida");
-}
-
 const { jsPDF } = window.jspdf;
 
 const valoresMercado = {
@@ -89,8 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('exportarHistorico').addEventListener('click', exportarHistorico);
     document.getElementById('importarHistorico').addEventListener('click', () => document.getElementById('inputImportar').click());
-    document.getElementById('salvarNoGithub').addEventListener('click', salvarNoGithub);
-    document.getElementById('carregarDoGithub').addEventListener('click', carregarDoGithub);
     document.getElementById('inputImportar').addEventListener('change', importarHistorico);
 });
 
@@ -414,7 +388,7 @@ function reeditarOrcamento(index) {
                 });
                 el.querySelector('.btn-buscar').addEventListener('click', () => buscarValor(el));
             }
-            el.querySelector('.tipoServico').value = servico.tipo || '';
+            el.querySelector('.tipoServico").value = servico.tipo || '';
             el.querySelector('.descricaoServico').value = servico.descricao || '';
             el.querySelector('.valorServico').value = servico.valor || '';
         });
@@ -475,47 +449,7 @@ function importarHistorico(e) {
     leitor.readAsText(arq);
 }
 
-async function salvarNoGithub() {
-    try {
-        const hist = localStorage.getItem('orcamentos') || '[]';
-        const conteudo = btoa(unescape(encodeURIComponent(hist)));
-        let sha = '';
-        try {
-            const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.usuario}/${GITHUB_CONFIG.repositorio}/contents/${GITHUB_CONFIG.nomeArquivo}`, {headers:{Authorization:`token ${GITHUB_CONFIG.token}`}});
-            if (res.ok) sha = (await res.json()).sha;
-        } catch {}
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.usuario}/${GITHUB_CONFIG.repositorio}/contents/${GITHUB_CONFIG.nomeArquivo}`, {
-            method:'PUT',
-            headers:{Authorization:`token ${GITHUB_CONFIG.token}`,'Content-Type':'application/json'},
-            body:JSON.stringify({message:`Atualização ${new Date().toLocaleString('pt-BR')}`, content:conteudo, sha})
-        });
-        res.ok ? alert('✅ Salvo na nuvem!') : alert('❌ Erro ao salvar');
-    } catch { alert('❌ Erro de conexão'); }
-}
-
-async function carregarDoGithub() {
-    try {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.usuario}/${GITHUB_CONFIG.repositorio}/contents/${GITHUB_CONFIG.nomeArquivo}`, {headers:{Authorization:`token ${GITHUB_CONFIG.token}`}});
-        if (!res.ok) throw Error('não encontrado');
-        const dados = await res.json();
-        const conteudo = JSON.parse(decodeURIComponent(escape(atob(dados.content))));
-        const junta = confirm('JUNTAR ou SUBSTITUIR?\nOK = JUNTAR | CANCELAR = SUBSTITUIR');
-        let atual = JSON.parse(localStorage.getItem('orcamentos')) || [];
-        if (junta) {
-            const ids = atual.map(i => i.nomeArquivo+i.dataHora);
-            const novos = conteudo.filter(i => !ids.includes(i.nomeArquivo+i.dataHora));
-            atual = [...novos, ...atual];
-        } else atual = conteudo;
-        localStorage.setItem('orcamentos', JSON.stringify(atual));
-        carregarHistorico();
-        alert('✅ Carregado da nuvem!');
-    } catch (e) { alert('❌ Erro: '+e.message); }
-}
-
 window.excluirDoHistorico = excluirDoHistorico;
 window.reeditarOrcamento = reeditarOrcamento;
 window.exportarHistorico = exportarHistorico;
 window.importarHistorico = importarHistorico;
-window.salvarNoGithub = salvarNoGithub;
-window.carregarDoGithub = carregarDoGithub;
-
