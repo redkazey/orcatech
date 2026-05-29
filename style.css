@@ -173,6 +173,73 @@ input:focus, select:focus {
     background: #2980b9;
 }
 
+/* Estilo Desconto */
+.desconto-box {
+    background: #fef9e7;
+    padding: 18px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 1px solid #f9e79f;
+}
+
+.desconto-box h3 {
+    font-size: 16px;
+    color: #b7950b;
+    margin-bottom: 12px;
+}
+
+.desconto-opcoes {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.desconto-opcoes label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #786c00;
+}
+
+/* Estilo Acréscimo */
+.acrescimo-box {
+    background: #eaf2f8;
+    padding: 18px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 1px solid #aed6f1;
+}
+
+.acrescimo-box h3 {
+    font-size: 16px;
+    color: #1f618d;
+    margin-bottom: 12px;
+}
+
+.acrescimo-opcoes {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.acrescimo-opcoes label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #154360;
+}
+
+.desconto-opcoes input[type="number"],
+.acrescimo-opcoes input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    margin: 0;
+}
+
 .total-box {
     background: #eafaf1;
     padding: 22px;
@@ -180,6 +247,26 @@ input:focus, select:focus {
     text-align: right;
     margin: 22px 0;
     border: 1px solid #abebc6;
+}
+
+.total-box .subtotal {
+    font-size: 15px;
+    color: #1e8449;
+    margin-bottom: 5px;
+}
+
+.total-box .valor-desconto {
+    font-size: 15px;
+    color: #c0392b;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.total-box .valor-acrescimo {
+    font-size: 15px;
+    color: #2980b9;
+    margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .total-box h3 {
@@ -289,5 +376,9 @@ input[placeholder="CPF"], input[placeholder="Telefone (WhatsApp)"] {
     }
     .cabecalho h1 {
         font-size: 22px;
+    }
+    .desconto-opcoes, .acrescimo-opcoes {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
