@@ -2,116 +2,282 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 body {
-    background-color: #f0f4f8;
-    padding: 20px;
+    background-color: #f5f7fa;
+    padding: 20px 15px;
+    line-height: 1.6;
 }
 
 .container {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-header h1 {
+.cabecalho {
     text-align: center;
-    color: #2c3e50;
     margin-bottom: 30px;
+    padding: 20px;
+    background: #2c3e50;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-h2 {
-    color: #34495e;
-    margin: 20px 0 10px;
+.cabecalho h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.cabecalho p {
+    font-size: 15px;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+.card h2 {
+    color: #2c3e50;
     font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.opcional {
+    font-size: 13px;
+    color: #7f8c8d;
+    font-weight: 400;
+}
+
+.grid-dados {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
 }
 
 input, select {
     width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border 0.3s;
 }
 
-.servico {
+input:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.servico-item {
+    background: #f8f9fa;
+    padding: 18px;
+    border-radius: 10px;
+    margin-bottom: 15px;
     display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+    border: 1px solid #eee;
 }
 
-.servico select, .servico input {
+.servico-item select {
     flex: 1;
-    margin: 0;
+    min-width: 220px;
+}
+
+.campo-personalizado {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.btn-buscar {
+    background: #f39c12;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-buscar:hover {
+    background: #e67e22;
+}
+
+.valor-sugerido {
+    font-weight: 500;
+    color: #27ae60;
+    background: #eafaf1;
+    padding: 8px 12px;
+    border-radius: 6px;
 }
 
 .removerServico {
     background: #e74c3c;
     color: white;
     border: none;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.3s;
 }
 
-button {
-    background: #2980b9;
+.removerServico:hover {
+    background: #c0392b;
+}
+
+.btn-adicionar {
+    background: #3498db;
     color: white;
     border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+    padding: 12px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
-    margin: 5px 0;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 10px;
+    transition: background 0.3s;
 }
 
-button:hover {
-    background: #1f618d;
+.btn-adicionar:hover {
+    background: #2980b9;
 }
 
-.total {
+.total-box {
+    background: #eafaf1;
+    padding: 20px;
+    border-radius: 10px;
     text-align: right;
     margin: 20px 0;
-    font-size: 18px;
-    font-weight: bold;
+    border: 1px solid #abebc6;
+}
+
+.total-box h3 {
     color: #27ae60;
+    font-size: 20px;
+    font-weight: 700;
 }
 
-.historico {
-    margin-top: 40px;
+#valorTotal {
+    font-size: 22px;
 }
 
-.historico ul {
+.btn-gerar {
+    width: 100%;
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.btn-gerar:hover {
+    background: #219653;
+}
+
+.historico-section ul {
     list-style: none;
 }
 
-.historico li {
-    padding: 12px;
+.historico-section li {
+    padding: 15px;
     background: #f8f9fa;
-    margin: 8px 0;
-    border-radius: 5px;
+    margin: 10px 0;
+    border-radius: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    border-left: 4px solid #3498db;
+}
+
+.historico-section li div:first-child {
+    flex: 1;
+    min-width: 200px;
+}
+
+.historico-section li strong {
+    color: #2c3e50;
+    display: block;
+}
+
+.historico-section li small {
+    color: #7f8c8d;
+}
+
+.historico-section button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-left: 8px;
+}
+
+.historico-section button:first-of-type {
+    background: #3498db;
+    color: white;
+}
+
+.historico-section button:last-of-type {
+    background: #e74c3c;
+    color: white;
+}
+
+.vazio {
+    color: #95a5a6;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Máscaras de entrada */
+input[placeholder="CPF"], input[placeholder="Telefone (WhatsApp)"] {
+    font-family: monospace;
+    font-size: 16px;
 }
 
 @media (max-width: 600px) {
-    .servico {
+    .servico-item {
+        flex-direction: column;
+    }
+    .campo-personalizado {
         flex-direction: column;
         align-items: stretch;
+    }
+    .historico-section li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
 }
 
